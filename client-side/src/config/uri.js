@@ -1,0 +1,1 @@
+export const SOCKET_URI = "http://localhost:8088/ws"
