@@ -4,6 +4,7 @@ import { EyeFilledIcon } from '../../assets/icon/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '../../assets/icon/EyeSlashFilledIcon';
 import { Form } from "antd";
 import { useRegister } from '../../hooks/useRegister';
+import 'flowbite';
 
 export default function Register() {
     const register = useRegister();
@@ -39,18 +40,19 @@ export default function Register() {
                     form={form}
                     name="normal_login"
                     onFinish={onFinish}
+                    className="mb-5"
                 >
-                    <Form.Item name={"displayName"}>
+                    <Form.Item name={"DisplayName"}>
                         <Input
                             label="Character Name"
                         />
                     </Form.Item>
-                    <Form.Item name={"username"}>
+                    <Form.Item name={"UserName"}>
                         <Input
-                            label="Username"
+                            label="UserName"
                         />
                     </Form.Item>
-                    <Form.Item name={"password"}>
+                    <Form.Item name={"Password"}>
                         <Input
                             label="Password"
                             variant="bordered"
@@ -67,12 +69,48 @@ export default function Register() {
                             className="w-full"
                         />
                     </Form.Item>
-                    <Form.Item name={"email"}>
+                    <Form.Item name={"Email"}>
                         <Input type="email" label="Email" />
                     </Form.Item>
-                    <Form.Item name={"phone"}>
-                        <Input type="tel" label="Phone" />
+                    <Form.Item name={"PhoneNumber"}>
+                        <Input type="tel" label="PhoneNumber" />
                     </Form.Item>
+                    {/* <Form.Item style={{marginBottom: "50px"}}>
+                        <button
+                            id="dropdownDefaultButton"
+                            data-dropdown-toggle="dropdown"
+                            class="text-default-400 w-full border text-center focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center justify-between dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            type="button"
+                        >
+                            Choose Role
+                            <svg
+                                class="w-2.5 h-2.5"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 10 6"
+                            >
+                                <path
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="m1 1 4 4 4-4"
+                                />
+                            </svg>
+                        </button>
+
+                        <div id="dropdown" class="z-10 hidden w-full bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                            <li>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Player</a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Admin</a>
+                            </li>
+                            </ul>
+                        </div>
+                    </Form.Item> */}
                     <Form.Item className='w-full'>
                         <Button
                             className='w-full'

@@ -7,17 +7,21 @@ namespace PokemonGame.Models
     public class Moves
     {
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonElement("_id"), BsonRepresentation(BsonType.Int64)]
         public long Id { get; set; }
+        [BsonElement("name")]
         public string Name { get; set; }
-        // Nếu bạn muốn lưu danh sách các ID của loại
-        // public List<long> TypeIds { get; set; } 
-
-        public Species Type { get; set; }
+        [BsonElement("type")]
+        public string Type { get; set; }
+        [BsonElement("power")]
         public long Power { get; set; }
-        public long Priority { get; set; }
-        public long EffectChance { get; set; }
+        [BsonElement("pp")]
         public long PP { get; set; }
+        [BsonElement("accuracy")]
         public long Accuracy { get; set; }
+        [BsonElement("effect")]
+        public string Effect { get; set; }
+        [BsonElement("short_effect")]
+        public string ShortEffect { get; set; }
     }
 }

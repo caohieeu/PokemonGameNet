@@ -1,8 +1,13 @@
-﻿namespace PokemonGame.Models.SubModel
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace PokemonGame.Models.SubModel
 {
     public class Species
     {
-        public string name { get; set; }
-        public string url { get; set; }
+        [BsonElement("name"), BsonRepresentation(BsonType.String)]
+        public string Name { get; set; }
+        [BsonElement("url"), BsonRepresentation(BsonType.String)]
+        public string Url { get; set; }
     }
 }

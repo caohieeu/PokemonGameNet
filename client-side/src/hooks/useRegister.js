@@ -7,7 +7,12 @@ const useRegister = () => {
     const register = async (userData) => {
         console.log(userData);
         try {
-            const response = await axiosInstance.post("auth/register", userData);
+            userData.Role = "Player"
+            const response = await axiosInstance.post("User/SignUp", userData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            });
             notification.open({
                 message: "Register success",
                 type: "success",

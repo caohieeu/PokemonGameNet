@@ -6,9 +6,9 @@ import Cookies from 'js-cookie';
 const useLogin = () => {
     const navigate = useNavigate();
     const login = async (userData) => {
-        console.log(userData);
         try {
-            const response = await axiosInstance.post("auth/login", userData);
+            const response = await axiosInstance.post("User/SignIn", userData);
+
             notification.open({
                 message: "Login success",
                 type: "success",

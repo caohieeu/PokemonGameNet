@@ -1,11 +1,18 @@
 ﻿using MongoDB.Driver;
+using PokemonGame.Settings;
+using System.Runtime.CompilerServices;
 
 namespace PokemonGame.Repositories.IRepository
 {
     public interface IRepository<TEntity> : IDisposable where TEntity : class 
     {
         Task<IEnumerable<TEntity>> GetAll(FilterDefinition<TEntity> filter);
+        Task<IEnumerable<TEntity>> GetMany(int page, int size);
+        Task<PaginationModel<TEntity>> GetManyByFilter(int page, int pageSize, FilterDefinition<TEntity> filter, SortDefinition<TEntity> sorDef);
+        Task<bool> IsExist(FilterDefinition<TEntity>? filter);
+        Task<TEntity> GetByFilter(FilterDefinition<TEntity> filter);
         Task<TEntity> FindById(string id);
         Task<bool> Add(TEntity entity);
+        Task<bool> UpdateOneByFilter(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update);
     }
 }

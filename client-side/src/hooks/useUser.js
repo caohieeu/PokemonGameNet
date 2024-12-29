@@ -1,19 +1,25 @@
 import { axiosInstance } from "../api/axiosClient";
 import { useNavigate } from 'react-router-dom';
+import { notification } from "antd";
 import Cookies from 'js-cookie';
 
 const useUser = () => {
-    const navigate = useNavigate();
     const user = async () => {
         try {
             const token = Cookies.get('auth_token');
-            const response = await axiosInstance.get("user", {
+            localStorage.setItem("my_token", token)
+            const response = await axiosInstance.get("User/GetInfoUser", {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log(response.data);
             return response.data;
         } catch (err) {
-            console.log(err);
+            // notification.open({
+            //     message: err.response?.data?.message || 'Get user failed',
+            //     type: "error",
+            //     showProgress: true,
+            //     pauseOnHover: false,
+            // });
+            console.log(err.response.data.message || 'Get user failed')
         }
     };
 

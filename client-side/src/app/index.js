@@ -3,7 +3,7 @@ import Pokedex from "./pokedex/Pokedex";
 
 export default function index() {
     return (
-        <div>
+        <div className="px-4 sm:px-6 md:px-8 lg:px-36">
             <Header />
             <Pokedex />
         </div>

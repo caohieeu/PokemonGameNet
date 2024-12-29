@@ -5,13 +5,20 @@ import logo from '../assets/img/pokemon-logo.png';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Button, User } from "@nextui-org/react";
 import { PlusIcon } from "../assets/icon/PlusIcon";
 import { useUser } from "../hooks/useUser";
+import { useLogout } from "../hooks/useLogout";
+import { SERVER_URI } from "../utils/Uri";
+import { useLocation } from "react-router-dom";
 
 export default function Header() {
     const [user, setUser] = useState();
+    const [activeTab, setActiveTab] = useState("pokdex");
+    const location = useLocation();
     const getUSer = useUser();
+    const logoutUser = useLogout();
     const menuItems = [
         "Home",
         "Pokedex",
+        "Chat Rooms",
         "Ranking",
         "Log Out",
     ];
@@ -26,6 +33,22 @@ export default function Header() {
             label: "Log out",
         }
     ];
+
+    useEffect(() => {
+        const path = location.pathname;
+        if (path === "/home") {
+            setActiveTab("home");
+        } else if (path === "/pokedex") {
+            setActiveTab("pokedex");
+        } else if (path === "/ranking") {
+            setActiveTab("ranking");
+        } else if (path === "/chat-rooms") {
+            setActiveTab("chatRooms");
+        }
+         else {
+            setActiveTab("");
+        }
+    }, [location]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -44,7 +67,7 @@ export default function Header() {
                 <NavbarMenuToggle />
             </NavbarContent>
 
-            <NavbarContent className="sm:hidden pr-3" justify="center">
+            <NavbarContent className="sm:hidden pr-3" justify="start">
                 <NavbarBrand>
                     <img
                         src={logo}
@@ -53,7 +76,7 @@ export default function Header() {
                 </NavbarBrand>
             </NavbarContent>
 
-            <NavbarContent className="hidden sm:flex gap-4" justify="center">
+            <NavbarContent className="hidden sm:flex gap-4 px-0" justify="center">
                 <NavbarBrand>
                     <img
                         src={logo}
@@ -61,19 +84,47 @@ export default function Header() {
                     />
                     {/* <p className="font-bold text-inherit">ACME</p> */}
                 </NavbarBrand>
-                <NavbarItem>
-                    <Link color="foreground" href="/home">
+                <NavbarItem isActive={activeTab === "home"}>
+                    <Link
+                        onClick={() => setActiveTab("home")}
+                        color={activeTab === "home" ? "warning" : "foreground"}
+                        href="/home">
                         Home
                     </Link>
                 </NavbarItem>
-                <NavbarItem isActive>
-                    <Link href="/pokedex" aria-current="page" color="warning">
+                <NavbarItem isActive={activeTab === "pokedex"}>
+                    <Link
+                        onClick={() => setActiveTab("pokedex")}
+                        href="/pokedex"
+                        aria-current="page"
+                        color={activeTab === "pokedex" ? "warning" : "foreground"}>
                         Pokedex
                     </Link>
                 </NavbarItem>
-                <NavbarItem>
-                    <Link color="foreground" href="#">
+                <NavbarItem isActive={activeTab === "chatRooms"}>
+                    <Link
+                        onClick={() => setActiveTab("chatRooms")}
+                        color={activeTab === "chatRooms" ? "warning" : "foreground"}
+                        href="/chat-rooms"
+                    >
+                        Chat Rooms
+                    </Link>
+                </NavbarItem>
+                <NavbarItem isActive={activeTab === "ranking"}>
+                    <Link
+                        onClick={() => setActiveTab("ranking")}
+                        color={activeTab === "ranking" ? "warning" : "foreground"}
+                        href="/ranking"
+                    >
                         Ranking
+                    </Link>
+                </NavbarItem>
+                <NavbarItem>
+                    <Link 
+                        className="px-4 py-1 bg-[rgb(125,125,235)] text-white rounded-md"
+                        color="foreground" 
+                        href="/play">
+                        Play
                     </Link>
                 </NavbarItem>
             </NavbarContent>
@@ -98,7 +149,7 @@ export default function Header() {
                     >
                         <DropdownTrigger>
                             <a href="#">
-                                <Avatar showFallback src='https://images.unsplash.com/broken' />
+                                <Avatar showFallback src={`${SERVER_URI}${user?.data?.ImagePath}`} />
                             </a>
                         </DropdownTrigger>
                         <DropdownMenu
@@ -126,15 +177,15 @@ export default function Header() {
                                     className="h-14 gap-2 opacity-100"
                                 >
                                     <User
-                                        name={user?.data?.displayName || "not found"}
-                                        description={user?.data?.email || "not found"}
+                                        name={user?.data?.DisplayName || "not found"}
+                                        description={user?.data?.Email || "not found"}
                                         classNames={{
                                             name: "text-default-600",
                                             description: "text-default-500",
                                         }}
                                         avatarProps={{
                                             size: "sm",
-                                            src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+                                            src: `${SERVER_URI}${user?.data?.ImagePath}`,
                                         }}
                                     />
                                 </DropdownItem>
@@ -178,7 +229,11 @@ export default function Header() {
                                 <DropdownItem key="help_and_feedback">
                                     Help & Feedback
                                 </DropdownItem>
-                                <DropdownItem key="logout">Log Out</DropdownItem>
+                                <DropdownItem
+                                    onPress={logoutUser}
+                                    key="logout">
+                                    Log Out
+                                </DropdownItem>
                             </DropdownSection>
                         </DropdownMenu>
                     </Dropdown>

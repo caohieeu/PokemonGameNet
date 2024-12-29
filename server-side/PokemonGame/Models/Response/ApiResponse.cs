@@ -1,10 +1,13 @@
-﻿namespace PokemonGame.Models.Response
+﻿using Newtonsoft.Json;
+
+namespace PokemonGame.Models.Response
 {
     public class ApiResponse
     {
 
         public int code { get; set; }
         public string message { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public object data { get; set; }
         public ApiResponse()
         {
