@@ -7,9 +7,10 @@ using PokemonGame.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using PokemonGame.Dtos.Response;
 using PokemonGame.DAL;
-using PokemonGame.Dtos.Request;
 using AutoMapper;
 using PokemonGame.Models.SubModel;
+using PokemonGame.Dtos.Pokemon;
+using MongoDB.Bson;
 
 namespace PokemonGame.Services
 {
@@ -71,7 +72,7 @@ namespace PokemonGame.Services
             return await _userContext.GetCurrentUserInfo();
         }
 
-        public async Task<bool> AddNewTeamPokemon(string userId, List<TeamRequestDto> teamRequestDtos)
+        public async Task<bool> AddNewTeamPokemon(string userId, AddTeamPokemonDto teamPokemon)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -80,9 +81,15 @@ namespace PokemonGame.Services
                 throw new NotFoundException("User not found");
             }
 
+            if(user.Teams.Count == 0)
+            {
+                user.Teams = new List<TeamPokemonDto>();
+            }
+
+            var team = new TeamPokemonDto();
             var listPokemon = new List<Pokemon>();
 
-            foreach(var poke in teamRequestDtos)
+            foreach(var poke in teamPokemon.Pokemons)
             {
                 FilterDefinition<Pokemon> filter = Builders<Pokemon>.Filter.Eq(x => x.Id, poke.PokemonId);
                 var pokemon = await _pokeRepository.GetByFilter(filter);
@@ -95,7 +102,7 @@ namespace PokemonGame.Services
                 poke.Stat.Defense + poke.Stat.SpAtk +
                 poke.Stat.SpDef + poke.Stat.Speed;
 
-                if (additionStat > poke.TotalStat)
+                if (additionStat > Utils.Global.Global.TotalStat)
                 {
                     throw new BadRequestException("Exceeding the permissible limit");
                 }
@@ -133,7 +140,11 @@ namespace PokemonGame.Services
                 listPokemon.Add(pokemon);
             }
 
-            user.Pokemons = listPokemon;
+            team.Id = ObjectId.GenerateNewId().ToString();
+            team.Name = teamPokemon.Name;
+            team.Pokemons = listPokemon;
+
+            user.Teams.Add(team);
             try
             {
                 var res = await _userManager.UpdateAsync(user);
@@ -149,6 +160,17 @@ namespace PokemonGame.Services
         {
             var user = await _userManager.FindByNameAsync(username);
             return _mapper.Map<InfoUserResponseDto>(user);
+        }
+
+        public List<InfoUserResponseDto> GetUsers(string userName)
+        {
+            var users = _userManager.Users
+                .Where(u => u.UserName.Contains(userName))
+                .ToList();
+
+            var usersReponse = users.Select(u => _mapper.Map<InfoUserResponseDto>(u)).ToList();
+
+            return usersReponse;
         }
     }
 }

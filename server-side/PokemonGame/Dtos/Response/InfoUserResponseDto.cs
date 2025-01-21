@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using PokemonGame.Models;
+using PokemonGame.Dtos.Pokemon;
 
 namespace PokemonGame.Dtos.Response
 {
@@ -14,7 +15,7 @@ namespace PokemonGame.Dtos.Response
         public string ImagePath { get; set; }
         public HashSet<string> Roles { get; set; }
         public List<string> Moves { get; set; } = null;
-        public List<Pokemon> Pokemons { get; set; } = null;
+        public List<TeamPokemonDto> Teams { get; set; } = null;
         public DateTime DateCreated { get; set; }
     }
 }

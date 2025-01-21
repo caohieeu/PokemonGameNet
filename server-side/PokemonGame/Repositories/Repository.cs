@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using PokemonGame.DAL;
+using PokemonGame.Exceptions;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Settings;
 
@@ -40,10 +41,6 @@ namespace PokemonGame.Repositories
         protected static FilterDefinition<TEntity> FilterId(string key, string keyValue)
         {
             return Builders<TEntity>.Filter.Eq(key, keyValue);
-        }
-        public Task<TEntity> FindById(string id)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<TEntity>> GetMany(int page, int size)
@@ -86,15 +83,36 @@ namespace PokemonGame.Repositories
         }
         public async Task<TEntity> GetByFilter(FilterDefinition<TEntity> filter)
         {
-            var data = await _collection.FindAsync(filter);
-            var res = data.SingleOrDefault();
-            return res;
+            try
+            {
+                var data = await _collection.FindAsync(filter);
+                var res = data.SingleOrDefault();
+                return res;
+            } catch
+            {
+                throw new NotFoundException("This content is not found");
+            }
         }
 
         public async Task<bool> UpdateOneByFilter(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update)
         {
             var res = await _collection.UpdateOneAsync(filter, update);
             return res.ModifiedCount > 0;
+        }
+
+        public async Task<bool> Remove(string id)
+        {
+            try
+            {
+                var filter = FilterId("Id", id);
+
+                var res = await _collection.DeleteOneAsync(filter);
+
+                return true;
+            } catch
+            {
+                return false;
+            }
         }
     }
 }

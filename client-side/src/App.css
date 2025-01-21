@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+:where(.css-dev-only-do-not-override-qnu6hi).ant-slider-horizontal:hover {
+  background-color: rgb(234, 179, 8)
+}
+
+.ant-slider-track {
+  background-color: #4CAF50; /* Phần đã kéo */
+}
+
+.ant-slider-handle {
+  border-color: #FF5733; /* Màu của nút kéo */
+}
+
+.ant-slider-rail {
+  background-color: #D3D3D3; /* Phần chưa kéo */
+}
+
+:where(.css-dev-only-do-not-override-qnu6hi).ant-slider .ant-slider-track {
+  background-color: #FF5733;
+}

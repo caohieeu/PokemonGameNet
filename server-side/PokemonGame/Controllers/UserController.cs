@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
 using PokemonGame.Dtos.Auth;
-using PokemonGame.Dtos.Request;
+using PokemonGame.Dtos.Pokemon;
 using PokemonGame.Models;
 using PokemonGame.Models.Response;
 using PokemonGame.Services.IService;
@@ -21,6 +21,15 @@ namespace PokemonGame.Controllers
         public UserController(IUserService userService)
         {
             _userService = userService;
+        }
+        [HttpGet("{UserName}")]
+        public IActionResult GetUsers(string UserName)
+        {
+            return Ok(new ApiResponse(
+                200,
+                "Success",
+                _userService.GetUsers(UserName)
+            ));
         }
         [HttpGet("GetAllUser")]
         public async Task<IEnumerable<ApplicationUser>> GetAllUser()
@@ -73,9 +82,9 @@ namespace PokemonGame.Controllers
         }
         [HttpPut("AddNewTeam/{UserId}")]
         public async Task<IActionResult> AddNewTeamPokemon(
-            [FromBody] List<TeamRequestDto> teamRequestDto, string UserId)
+            [FromBody] AddTeamPokemonDto teamPokemon, string UserId)
         {
-            return Ok(new ApiResponse(200, "Success", await _userService.AddNewTeamPokemon(UserId, teamRequestDto)));
+            return Ok(new ApiResponse(200, "Success", await _userService.AddNewTeamPokemon(UserId, teamPokemon)));
         }
     }
 }

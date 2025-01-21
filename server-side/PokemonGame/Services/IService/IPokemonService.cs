@@ -7,5 +7,6 @@ namespace PokemonGame.Services.IService
     {
         Task<PaginationModel<Pokemon>> GetPokemonAsync(int page, int pageSize, string namePokemon);
         Task<Pokemon> GetDetailPokemonAsync(int pokemonId);
+        Task<List<Pokemon>> GetRandomPokemons();
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using PokemonGame.DAL;
+using PokemonGame.Dtos.Response;
 using PokemonGame.Dtos.RoomChat;
 using PokemonGame.Exceptions;
 using PokemonGame.Models.SubModel;
@@ -45,16 +46,84 @@ namespace PokemonGame.Hubs
                 await Clients.Client(connectionId).SendAsync("ReceiveMessage", username, message);
             }
         }
-        public async Task SendMessageToGroup(string group, string message)
+        public async Task SendMessageToGroup(string roomId, string username, string message)
         {
-            await Clients.Group(group).SendAsync("ReceiveMessage", message);
+            var roomReceiveId = roomId;
+            await Clients.Group(roomId).SendAsync("ReceiveMessageGroup", username, message, roomReceiveId);
         }
-        public async Task JoinGroup(string group)
+        public async Task JoinGroup(string roomId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, group);
+            var user = await GetUserFromContext();
+
+            if (user == null)
+            {
+                return;
+            }
+
+            await _roomChatService.AddUserToConnection(user.UserName, Context.ConnectionId);
+
+            var joinRoomDto = new JoinRoomDto();
+            var participant = new Participant
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Avatar = user.ImagePath,
+            };
+            joinRoomDto.RoomChatID = roomId;
+            joinRoomDto.Participant = participant;
+
+            var userConnection = _roomChatService.GetUserConnections(user.UserName);
+            foreach (var connection in userConnection)
+            {
+                await Groups.AddToGroupAsync(connection, roomId);
+            }
+
+            if (!await _roomChatService.AddUserToRoom(joinRoomDto))
+            {
+                return;
+            }
+
+            await Clients.Group(roomId).SendAsync("UserJoined", new
+            {
+                userName = user.UserName,
+                avatar = user.ImagePath
+            });
         }
-        public override async Task OnConnectedAsync()
+        public async Task ExitGroup(string roomId)
         {
+            var user = await GetUserFromContext();
+
+            if (user == null)
+            {
+                return;
+            }
+
+            await _roomChatService.RemoveUserConnection(user.UserName, Context.ConnectionId);
+
+            var userResponse = new
+            {
+                userName = user.UserName,
+                avatar = user.ImagePath
+            };
+
+            var rmParticipant = new RemoveParticipantDto();
+            rmParticipant.RoomChatID = roomId;
+            rmParticipant.UserId = user.Id;
+
+            var userConnection = _roomChatService.GetUserConnections(user.Id);
+            foreach (var connection in userConnection)
+            {
+                await Groups.RemoveFromGroupAsync(connection, roomId);
+            }
+
+            await _roomChatService.RemoveUserFromRoom(rmParticipant);
+
+            await Clients.Group(roomId).SendAsync("UserDisconnectedGroup", user.UserName);
+        }
+        public async Task<InfoUserResponseDto> GetUserFromContext()
+        {
+            var user = new InfoUserResponseDto();
+
             var httpContext = Context.GetHttpContext();
             var token = httpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "")
                        ?? httpContext?.Request.Query["access_token"];
@@ -64,29 +133,50 @@ namespace PokemonGame.Hubs
                 throw new Exception("Token not found in Authorization header.");
             }
 
-            if(!_userContext.CheckToken(token))
+            if (!_userContext.CheckToken(token))
             {
-                return;
+                return null;
             }
 
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
             var username = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "UserName")?.Value;
-            if(string.IsNullOrEmpty(username))
+            if (string.IsNullOrEmpty(username))
             {
                 throw new NotFoundException("UserName is not found in token claims");
             }
 
-            var user = await _userService.GetUserByUsername(username);
+            user = await _userService.GetUserByUsername(username);
+
+            return user;
+        }
+        public override async Task OnConnectedAsync()
+        {
+            var user = new InfoUserResponseDto();
+
+            try
+            {
+                user = await GetUserFromContext();
+
+                if (user == null)
+                {
+                    return;
+                }
+            }
+            catch
+            {
+                await base.OnConnectedAsync();
+                return;
+            }
 
             var userResponse = new
             {
-                userName = username,
+                userName = user.UserName,
                 avatar = user.ImagePath
             };
 
-            await _roomChatService.AddUserToConnection(username, Context.ConnectionId);
+            //await _roomChatService.AddUserToConnection(user.UserName, Context.ConnectionId);
 
             //add user connected to roomchat
             var allRoom = await _roomChatService.GetAllRoomChat();
@@ -98,7 +188,7 @@ namespace PokemonGame.Hubs
             var participant = new Participant
             {
                 UserId = user.Id,
-                UserName = username,
+                UserName = user.UserName,
                 Avatar = user.ImagePath,
             };
             joinRoomDto.Participant = participant;
@@ -115,27 +205,9 @@ namespace PokemonGame.Hubs
     
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var httpContext = Context.GetHttpContext();
-            var token = httpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "")
-                       ?? httpContext?.Request.Query["access_token"];
+            var user = await GetUserFromContext();
 
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new Exception("Token not found in Authorization header.");
-            }
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-
-            var username = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "UserName")?.Value;
-            if (string.IsNullOrEmpty(username))
-            {
-                throw new NotFoundException("UserName is not found in token claims");
-            }
-
-            var user = await _userService.GetUserByUsername(username);
-
-            await _roomChatService.RemoveUserConnection(username, Context.ConnectionId);
+            //await _roomChatService.RemoveUserConnection(user.UserName, Context.ConnectionId);
 
             var allRoom = await _roomChatService.GetAllRoomChat();
             var rmParticipant = new RemoveParticipantDto();
@@ -147,7 +219,7 @@ namespace PokemonGame.Hubs
 
             await _roomChatService.RemoveUserFromRoom(rmParticipant);
 
-            await Clients.All.SendAsync("UserDisconnected", username);
+            await Clients.All.SendAsync("UserDisconnected", user.UserName);
 
             await base.OnDisconnectedAsync(exception);
         }

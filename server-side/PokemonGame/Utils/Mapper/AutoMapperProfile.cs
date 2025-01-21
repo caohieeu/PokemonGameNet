@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PokemonGame.Dtos.Response;
+using PokemonGame.Dtos.RoomBattle;
 using PokemonGame.Dtos.RoomChat;
 using PokemonGame.Models;
 using PokemonGame.Models.SubModel;
@@ -14,6 +15,7 @@ namespace PokemonGame.Utils.Mapper
             CreateMap<MovesPokemon, Moves>().ReverseMap();
             CreateMap<RoomChatCreateDto, RoomChat>().ReverseMap();
             CreateMap<Participant, InfoUserResponseDto>().ReverseMap();
+            CreateMap<ParticipantRoomBattleDto, Pokemon>().ReverseMap();
         }
     }
 }

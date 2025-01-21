@@ -9,6 +9,8 @@ import Pokedex from './app/pokedex/Pokedex';
 import Home from './app/home/Home';
 import Play from './app/play/Play';
 import ChatRooms from './app/chat-rooms/ChatRooms';
+import Leaderboard from './app/leader-board/LeaerBoard';
+import BattleRoom from './app/battle-room/BattleRoom';
 
 function App() {
   return (
@@ -21,8 +23,10 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="pokedex" element={<Pokedex />} />
             <Route path="home" element={<Home />} />
+            <Route path="leader-board" element={<Leaderboard />} />
             <Route path="play" element={<Play />} />
             <Route path="chat-rooms" element={<ChatRooms />} />
+            <Route path="battle-room/:roomId" element={<BattleRoom />} />
           </Routes>
         </BrowserRouter>
       </NextUIProvider>

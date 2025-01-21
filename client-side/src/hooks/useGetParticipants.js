@@ -12,7 +12,7 @@ const useGetParticipants = (roomId = "") => {
         const fetchParticipants = async () => {
             try {
                 setLoading(true);
-
+                
                 const response = await axiosInstance.get(`RoomChat/GetParticipants/${roomId}`);
                 setParticipants(response.data);
 

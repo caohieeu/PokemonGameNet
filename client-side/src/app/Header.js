@@ -40,7 +40,7 @@ export default function Header() {
             setActiveTab("home");
         } else if (path === "/pokedex") {
             setActiveTab("pokedex");
-        } else if (path === "/ranking") {
+        } else if (path === "/leader-board") {
             setActiveTab("ranking");
         } else if (path === "/chat-rooms") {
             setActiveTab("chatRooms");
@@ -110,13 +110,13 @@ export default function Header() {
                         Chat Rooms
                     </Link>
                 </NavbarItem>
-                <NavbarItem isActive={activeTab === "ranking"}>
+                <NavbarItem isActive={activeTab === "leader-board"}>
                     <Link
-                        onClick={() => setActiveTab("ranking")}
-                        color={activeTab === "ranking" ? "warning" : "foreground"}
-                        href="/ranking"
+                        onClick={() => setActiveTab("leader-board")}
+                        color={activeTab === "leader-board" ? "warning" : "foreground"}
+                        href="/leader-board"
                     >
-                        Ranking
+                        Leader Board
                     </Link>
                 </NavbarItem>
                 <NavbarItem>

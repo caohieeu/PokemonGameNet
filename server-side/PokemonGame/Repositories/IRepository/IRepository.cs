@@ -1,6 +1,5 @@
 ﻿using MongoDB.Driver;
 using PokemonGame.Settings;
-using System.Runtime.CompilerServices;
 
 namespace PokemonGame.Repositories.IRepository
 {
@@ -11,8 +10,9 @@ namespace PokemonGame.Repositories.IRepository
         Task<PaginationModel<TEntity>> GetManyByFilter(int page, int pageSize, FilterDefinition<TEntity> filter, SortDefinition<TEntity> sorDef);
         Task<bool> IsExist(FilterDefinition<TEntity>? filter);
         Task<TEntity> GetByFilter(FilterDefinition<TEntity> filter);
-        Task<TEntity> FindById(string id);
+        //Task<TEntity> FindById(string id);
         Task<bool> Add(TEntity entity);
+        Task<bool> Remove(string id);
         Task<bool> UpdateOneByFilter(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update);
     }
 }

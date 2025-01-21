@@ -66,7 +66,12 @@ namespace PokemonGame.Services
             {
                 throw new NotFoundException("Room chat not found");
             }
-            
+
+            if (await IsExistParticipant(joinRoomDto.RoomChatID, joinRoomDto.Participant.UserId))
+            {
+                return false;
+            }
+
             var builder = Builders<RoomChat>.Update;
             var update = builder.Push(rc => rc.Participants, joinRoomDto.Participant);
             var res = await _roomChatRepository.UpdateOneByFilter(filter, update);
@@ -105,14 +110,18 @@ namespace PokemonGame.Services
             return res.ToList();
         }
 
-        public async Task<bool> IsExistParticipant(string userId)
+        public async Task<bool> IsExistParticipant(string roomId, string userId)
         {
-            FilterDefinition<RoomChat> filter = Builders<RoomChat>.Filter.ElemMatch(
+            var filter = Builders<RoomChat>.Filter.And(
+                Builders<RoomChat>.Filter.Eq(rc => rc.Id, roomId),
+                Builders<RoomChat>.Filter.ElemMatch(
                 rc => rc.Participants,
-                Builders<Participant>.Filter.Eq(p => p.UserId, userId)
-             );
+                participant => participant.UserId == userId
+             )
+            );
+
             return await _roomChatRepository.IsExist(filter);
-        }
+        } 
 
         public async Task<List<Participant>> GetParticipants(string roomId)
         {

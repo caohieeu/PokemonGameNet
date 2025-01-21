@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input, Button, List, Avatar } from 'antd';
-import ChatConnector from '../../context/ChatConnector';
+import ChatConnector from '../../context/ChatHubConnector';
 import useUserInfo from '../../hooks/useUserInfo';
 import { SERVER_URI } from '../../utils/Uri';
 import useGetParticipants from '../../hooks/useGetParticipants';
 
 export default function LoobyRooms({ roomId }) {
+    const messagesEndRef = useRef(null);
     const { user } = useUserInfo();
     const { participants, reload } = useGetParticipants(roomId);
     const [messages, setMessages] = useState([]);
@@ -46,7 +47,7 @@ export default function LoobyRooms({ roomId }) {
 
     useEffect(() => {
         const handleMessageReceived = (username, message) => {
-            console.log(`${username} : ${message}`);
+            console.log("Lobby room: " + username + " " + message)
             setMessages((prevMessages) => [
                 ...prevMessages,
                 { id: prevMessages.length + 1, username, message },
@@ -54,14 +55,16 @@ export default function LoobyRooms({ roomId }) {
         };
 
         const handleConnected = (userResponse) => {
-            setUsers((prev) => [
-                ...prev,
-                {
-                    id: users.length + 1,
-                    name: userResponse.userName,
-                    avatar: userResponse.avatar,
-                },
-            ]);
+            if(userResponse) {
+                setUsers((prev) => [
+                    ...prev,
+                    {
+                        id: users.length + 1,
+                        name: userResponse.userName,
+                        avatar: userResponse.avatar,
+                    },
+                ]);   
+            }
             handleReload();
         };
 
@@ -71,7 +74,12 @@ export default function LoobyRooms({ roomId }) {
         };
 
         const connector = ChatConnector;
-        connector.events(handleMessageReceived, handleConnected, handleDisConnected);
+        connector.connection.off("ReceiveMessageGroup", handleMessageReceived);
+        connector.connection.off("ReceiveMessage", handleMessageReceived);
+
+        connector.connection.on("UserConnected", handleConnected);
+        connector.connection.on("ReceiveMessage", handleMessageReceived);
+        connector.connection.on("UserDisconnected", handleDisConnected);
 
         return () => {
             const connector = ChatConnector;
@@ -79,10 +87,16 @@ export default function LoobyRooms({ roomId }) {
             connector.connection.off("UserConnected", handleConnected);
             connector.connection.off("UserDisconnected", handleDisConnected);
         };
-    }, []);
+    }, [roomId]);
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col" style={{height: '67vh'}}>
             <div className="flex flex-col md:flex-row h-full">
                 <div className="md:w-1/3 w-full p-4 border-b md:border-r md:border-b-0 border-gray-200">
                     <h3 className="text-lg font-semibold">Users in Room</h3>
@@ -121,6 +135,7 @@ export default function LoobyRooms({ roomId }) {
                         ) : (
                             <div className="text-gray-400">No messages yet.</div>
                         )}
+                        <div ref={messagesEndRef} />
                     </div>
 
                     {user ? (

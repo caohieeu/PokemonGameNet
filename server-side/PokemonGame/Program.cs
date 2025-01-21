@@ -131,6 +131,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 builder.Services.AddScoped<IMoveRepository, MoveRepository>();
 builder.Services.AddScoped<IRoomChatRepository, RoomChatRepository>();
+builder.Services.AddScoped<IRoomBattleRepository, RoomBattleRepository>();
 
 //Services
 builder.Services.AddSingleton<IDatabaseSetting, DatabaseSetting>(st =>
@@ -140,6 +141,7 @@ builder.Services.AddSingleton<IMongoContext, MongoContext>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddScoped<IPokemonService, PokemonService>();
 builder.Services.AddScoped<IRoomChatService, RoomChatService>();
+builder.Services.AddScoped<IRoomBattleService, RoomBattleService>();
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var databaseSetting = sp.GetRequiredService<IOptions<DatabaseSetting>>().Value;

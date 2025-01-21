@@ -1,0 +1,137 @@
+@keyframes attackNormalAnimationPlayer {
+    0% {
+        transform: translateX(0) translateY(0);
+    }
+
+    50% {
+        transform: translateX(310px) translateY(-130px);
+    }
+
+    100% {
+        transform: translateX(0) translateY(0);
+    }
+}
+
+@keyframes attackFlashAnimationPlayer {
+    0% {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+
+    25% {
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: translateX(310px) translateY(-130px);
+        opacity: 1;
+        box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.6);
+        border-radius: 50%;
+    }
+
+    75% {
+        opacity: 0.4;
+        box-shadow: 0 0 30px 10px rgba(255, 0, 0, 0.7);
+    }
+
+    100% {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+        box-shadow: none;
+        border-radius: 50%;
+    }
+}
+
+@keyframes flameAttackPlayer {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(255, 69, 0, 0.8);
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+        box-shadow: 0 0 30px rgba(255, 69, 0, 1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0;
+        box-shadow: none;
+    }
+}
+
+@keyframes flameThrowerPlayer {
+    0% {
+        transform: scale(0.5) translateX(0) translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2) translateX(60px) translateY(-35px);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.5) translateX(200px) translateY(-125px);
+        opacity: 0;
+    }
+}
+
+@keyframes damageEffectPlayer {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    25% {
+        transform: scale(1.2);
+        filter: brightness(1.3);
+    }
+
+    50% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    75% {
+        transform: scale(0.9);
+        filter: brightness(0.8);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+/*animation*/
+.attack-flash-animation-player {
+    animation: attackFlashAnimationPlayer 1s ease-out;
+}
+
+.attack-normal-animation-player {
+    animation: attackNormalAnimationPlayer 1s ease-out;
+}
+
+.flame-animation-player {
+    animation: flameAttackPlayer 1s ease-out;
+}
+
+.enemy-damage-player {
+    animation: damageEffectPlayer 0.5s ease-in-out;
+}
+
+/*css*/
+.flame-player {
+    width: 60px;
+    height: 20px;
+    background-color: rgba(255, 69, 0, 1);
+    border-radius: 60%;
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    animation: flameThrowerPlayer 1s ease-out forwards;
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.7);
+}

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Dtos\Request\" />
     <Folder Include="wwwroot\Images\Avatars\" />
   </ItemGroup>
 

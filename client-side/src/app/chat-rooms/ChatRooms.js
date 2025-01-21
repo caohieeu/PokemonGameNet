@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs, Card } from 'antd';
+import { Tabs, Card, notification } from 'antd';
+import { Button, Modal, Space } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
 import Header from '../Header';
 import ChatRoomContent from '../../components/ChatRoomContent';
 import LoobyRooms from '../../components/chat-rooms/LoobyRooms';
 import BattleRoom from '../../components/chat-rooms/BattleRoom';
 import useGetRooms from '../../hooks/useGetRooms';
+import ChatConnector from '../../context/ChatHubConnector';
+import useUserInfo from '../../hooks/useUserInfo';
+import ChatHubConnector from '../../context/ChatHubConnector';
 
 export default function ChatRooms() {
   const [activeKey, setActiveKey] = useState('roomList');
@@ -35,11 +39,14 @@ export default function ChatRooms() {
     });
     setActiveKey(room?.Id); 
   };
-  
-  
 
   const onEdit = (targetKey, action) => {
     if (action === 'remove') {
+      if(targetKey !== 'roomList') {
+        const connector = ChatHubConnector;
+        connector.ExitGroup(targetKey);
+      }
+
       const updatedTabs = openedTabs.filter((tab) => tab.key !== targetKey);
       setOpenedTabs(updatedTabs);
       setActiveKey(updatedTabs.length > 0 ? updatedTabs[0].key : 'roomList');
@@ -52,6 +59,7 @@ export default function ChatRooms() {
       <h1 className="text-center text-4xl font-bold my-4 text-[#555555]">
         Chat Rooms
       </h1>
+
       <div style={{ padding: '16px' }}>
         <Tabs
           type="editable-card"
@@ -60,15 +68,14 @@ export default function ChatRooms() {
           onEdit={onEdit}
         >
           {openedTabs.map((tab) => (
-            <Tabs.TabPane tab={tab.label} key={tab.key} closable={tab.closable ?? true}>
+            <Tabs.TabPane 
+              tab={tab.label}
+              key={tab.key} 
+              closable={tab.closable ?? true}>
               {tab.key !== "roomList" ? (
                 tab.key === '676f9a07849fb9191106065f' ? (
                   <LoobyRooms roomId={tab.key} />
-                ) : (tab.key === '6770dba4b120d48bc4900c53' ? (
-                  <BattleRoom />
-                ) : (tab.key === '3' ? (
-                  <LoobyRooms />
-                ) : (<LoobyRooms />)))
+                ) : <BattleRoom roomId={tab.key} />
               ) : tab.children }
             </Tabs.TabPane>
           ))}
@@ -79,13 +86,40 @@ export default function ChatRooms() {
 }
 
 const RoomList = ({ onRoomSelect }) => {
-  // const rooms = [
-  //   { id: '1', name: 'Lobby', description: 'Room chat to all user.', content: 'Welcome to Room 1' },
-  //   { id: '2', name: 'Room 2', description: 'Phòng chat về thể thao.', content: 'Welcome to Room 2' },
-  //   { id: '3', name: 'Room 3', description: 'Phòng chat về âm nhạc.', content: 'Welcome to Room 3' },
-  // ];
-
+  const { user } = useUserInfo();
   const { roomChats } = useGetRooms(true);
+
+  const handleJoinRoom = (room) => {
+    if(room?.Name !== "Lobby") {
+      if(!user) {
+        notification.open({
+          message: "Login required to join this chat room",
+          type: "error",
+          showProgress: true,
+          pauseOnHover: false,
+      });
+      return;
+    }
+
+      const connector = ChatConnector;
+      connector.JoinGroup(room?.Id)
+    }
+    onRoomSelect(room)
+  }
+
+  const onModalJoinRoom = (room) => {
+    Modal.confirm({
+      title: 'Confirm',
+      content: 'Join this room ?',
+      onOk: () => {handleJoinRoom(room)},
+      footer: (_, { OkBtn, CancelBtn }) => (
+        <>
+          <CancelBtn />
+          <OkBtn />
+        </>
+      ),
+    });
+  }
 
   return (
     <div>
@@ -95,7 +129,9 @@ const RoomList = ({ onRoomSelect }) => {
           key={room?.Id}
           bordered
           style={{ marginBottom: 16 }}
-          onClick={() => onRoomSelect(room)}
+          onClick={() => {
+            onModalJoinRoom(room)
+          }}
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <MessageOutlined style={{ fontSize: 24, color: '#1890ff', marginRight: 12 }} />

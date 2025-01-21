@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Button, List, Avatar } from 'antd';
-import ChatConnector from '../context/ChatConnector';
+import ChatConnector from '../context/ChatHubConnector';
 import useUserInfo from '../hooks/useUserInfo';
 
 export default function ChatRoomContent() {

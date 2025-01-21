@@ -1,0 +1,68 @@
+.ant-collapse-header {
+  background-color: #fbbf24;
+  color: black;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.ant-collapse-header:hover {
+  background-color: #f59e0b;
+  transform: scale(1.05);
+}
+
+/* Loại bỏ hover effect */
+.matching-btn:hover {
+  background-color: #fbbf24; /* Màu hover tương ứng */
+}
+
+/* Container chứa các chữ */
+.matching-text {
+  display: inline-flex;
+  gap: 5px; /* Khoảng cách giữa các chữ */
+  animation: wave 4s ease-in-out infinite; /* Lặp lại suốt thời gian dài */
+}
+
+/* Các chữ sẽ có animation riêng */
+.letter {
+  display: inline-block;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.matching-text .letter:nth-child(1) {
+  animation-delay: 2s;
+}
+
+.matching-text .letter:nth-child(2) {
+  animation-delay: 3.2s;
+}
+
+.matching-text .letter:nth-child(3) {
+  animation-delay: 3.4s;
+}
+
+@keyframes wave {
+  0% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

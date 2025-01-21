@@ -97,7 +97,7 @@ export default function Pokedex() {
       </div>
       <div className="gap-2 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 sm:grid-cols-3 px-0">
         <>
-          <Drawer width={640} placement="right" closable={false} onClose={onClose} open={open}>
+          <Drawer style={{padding: 20}} width={670} placement="right" closable={false} onClose={onClose} open={open}>
             <p
               className="site-description-item-profile-p"
               style={{

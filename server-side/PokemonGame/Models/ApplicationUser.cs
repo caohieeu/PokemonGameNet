@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDbGenericRepository.Attributes;
+using PokemonGame.Dtos.Pokemon;
 
 namespace PokemonGame.Models
 {
@@ -16,7 +17,7 @@ namespace PokemonGame.Models
         [BsonElement("role"), BsonRepresentation(BsonType.String)]
         public HashSet<string> Roles { get; set; }
         //public long Point { get; set; }
-        public List<Pokemon> Pokemons { get; set; } = null;
+        public List<TeamPokemonDto> Teams { get; set; } = null;
         [BsonElement("dateCreated"), BsonRepresentation(BsonType.DateTime)]
         public DateTime DateCreated { get; set; }
     }

@@ -27,5 +27,11 @@ namespace PokemonGame.Controllers
             var response = await _pokemonService.GetDetailPokemonAsync(pokemonId);
             return Ok(new ApiResponse(200, "success", response));
         }
+        [HttpGet("GetRandomPokemons")]
+        public async Task<IActionResult> GetRandomPokemons()
+        {
+            var response = await _pokemonService.GetRandomPokemons();
+            return Ok(new ApiResponse(200, "success", response));
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace PokemonGame.Services.IService
         Task AddUserToConnection(string username, string connectionId);
         Task RemoveUserConnection(string username, string connectionId);
         List<string> GetUserConnections(string username);
-        Task<bool> IsExistParticipant(string userId);
+        Task<bool> IsExistParticipant(string roomId, string userId);
         Task<List<Participant>> GetParticipants(string roomId);
     }
 }
