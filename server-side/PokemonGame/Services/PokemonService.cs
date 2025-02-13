@@ -56,7 +56,8 @@ namespace PokemonGame.Services
                 var movesRand = await GetRandomMoves(pokemon, 4);
                 var statRand = RandomStat(pokemon);
 
-                pokemonTeam.Moves = movesRand;
+                movesRand.ForEach(x => x.OriginalPP = (int)x.PP);
+                pokemonTeam.Moves = movesRand.ToList();
                 pokemonTeam.Stat = statRand;
                 pokemonTeam.OriginalStat = statRand;
 

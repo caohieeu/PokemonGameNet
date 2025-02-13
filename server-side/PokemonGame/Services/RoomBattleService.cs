@@ -245,11 +245,12 @@ namespace PokemonGame.Services
         {
             var room = await GetRoomBattle(roomId);
 
-            var filter = Builders<RoomBattle>.Filter.Eq(x => x.Id, roomId);
-            var builder = Builders<RoomBattle>.Update;
-            var update = builder.Set(x => x.Winner, userId);
+            room.Winner = userId;
+            room.Status = "Completed";
 
-            await _roomBattleRepository.UpdateOneByFilter(filter, update);
+            var res = await UpdateRoomBattle(room);
+            if (!res)
+                Console.WriteLine("update room battle error");
         }
 
         public async Task<bool> UpdateCurrentTurn(string roomId, string username)
@@ -323,7 +324,7 @@ namespace PokemonGame.Services
         public async Task<bool> UpdateRoomBattle(RoomBattle roomBattle)
         {
             var filter = Builders<RoomBattle>.Filter.Eq(x => x.Id, roomBattle.Id);
-            return  await _roomBattleRepository.ReplaceOneAsync(filter, roomBattle);
+            return await _roomBattleRepository.ReplaceOneAsync(filter, roomBattle);
         }
 
         public async Task<ParticipantRoomBattleDto> GetParticipant(string roomId, string username)

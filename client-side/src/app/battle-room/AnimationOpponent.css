@@ -106,6 +106,21 @@
     }
 }
 
+@keyframes missTextAnimationOpponent {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-30px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-60px);
+        opacity: 0;
+    }
+}
+
 /*animation*/
 .attack-flash-animation-opponent {
     animation: attackFlashAnimationOpponent 1s ease-out;
@@ -134,4 +149,25 @@
     left: 60%;
     animation: flameThrowerOpponent 1s ease-out forwards;
     box-shadow: 0 0 20px rgba(255, 69, 0, 0.7);
+}
+
+.miss-text-opponent {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: red;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: missTextAnimationOpponent 1s ease-out forwards;
+}
+
+.miss-text-player {
+    position: absolute;
+    top: 43%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: red;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: missTextAnimationOpponent 1s ease-out forwards;
 }

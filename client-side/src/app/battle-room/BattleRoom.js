@@ -26,15 +26,10 @@ export default function BattleRoom() {
   const [attack, setAttack] = useState(null);
   const [animationClass, setAnimationClass] = useState('');
   const [enemyAnimationClass, setEnemyAnimationClass] = useState('');
+  const [missed, setMissed] = useState('');
   const [player, setPlayer] = useState(null);
   const [opponent, setOpponent] = useState(null);
   const [currentPokemon, setCurrentPokemon] = useState(null);
-  // const [excuteTurn, setExcuteTurn] = useState({
-  //   roomId: "",
-  //   moveId: "",
-  //   newPokemon: "",
-  //   type: ""
-  // });
   const [isPlayer, setIsPlayer] = useState(false);
 
   const handleSwitch = (newPokemon) => {
@@ -91,17 +86,22 @@ export default function BattleRoom() {
 
   const handleReceiveBattleResult = (battleResult) => {
     console.log(battleResult)
-    reload();
+    setTimeout(reload(), 4000)
   }
 
   const handleMissedAttack = (username, moveName) => {
-    alert(`${username} missed ${moveName}`)
+    // alert(`${username} missed ${moveName}`)
+    setMissed(username)
     reload();
   }
 
   const handleSwitchPokemon = (username) => {
     console.log(username + " switch pokemon")
-    reload();
+    setTimeout(reload(), 4000)
+  }
+
+  const handleFinished = (roomId, username) => {
+    setTimeout(alert(`${username} win the game`), 2000)
   }
 
   useEffect(() => {
@@ -116,6 +116,7 @@ export default function BattleRoom() {
 
   useEffect(() => {
     const connector = GameHubConnector;
+    connector.connection.on("Finished", handleFinished)
     connector.connection.on("ReceiveBattleResult", handleReceiveBattleResult)
     connector.connection.on("MissedAttack", handleMissedAttack)
     connector.connection.on("SwitchPokemon", handleSwitchPokemon)
@@ -188,6 +189,7 @@ export default function BattleRoom() {
                     alt="Charizard"
                     className={`w-auto h-35 mr-4 ml-4 ${animationClass}`}
                   />
+                  {missed == player?.UserName && <div className="miss-text-opponent">Miss</div>}
                 </Popover>
                 {(attack == "Flamethrower") && (
                   <div>
@@ -221,6 +223,7 @@ export default function BattleRoom() {
                   alt={player?.CurrentPokemon?.Name}
                   className={`w-auto h-35 mr-4 ml-4 ${enemyAnimationClass}`}
                 />
+                {missed == opponent?.UserName && <div className="miss-text-player">Miss</div>}
               </div>
             </div>
           </div>
@@ -270,7 +273,8 @@ export default function BattleRoom() {
         <div className="grid grid-cols-2 gap-4">
           {roomBattle?.Participants?.find(p => p.UserName === user?.data?.UserName)?.CurrentPokemon?.Moves?.map((item) => (
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded"
+              disabled={item?.OriginalPP <= 0 ? true : false}
+              className={item?.OriginalPP <= 0 ? "bg-gray-500 text-white px-4 py-2 rounded" : "bg-green-500 text-white px-4 py-2 rounded"}
               onClick={() => handleAttack(item)}
             >
               <p className="text-black font-bold">{item.Name}</p>
@@ -279,7 +283,7 @@ export default function BattleRoom() {
                   <p>{type}</p>
                 ))} */}
                 {item?.Type}
-                <p>{item?.PP}/{item?.PP}</p>
+                <p>{item?.PP}/{item?.OriginalPP}</p>
               </div>
             </button>
           ))}

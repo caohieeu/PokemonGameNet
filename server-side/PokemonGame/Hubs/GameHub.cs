@@ -107,8 +107,8 @@ namespace PokemonGame.Hubs
 
                 var userConnection1 = _roomBattleService.GetUserConnections(player1.UserName);
                 var userConnection2 = _roomBattleService.GetUserConnections(player2.UserName);
-                await Groups.AddToGroupAsync(userConnection1.First(), room.Id);
-                await Groups.AddToGroupAsync(userConnection2.First(), room.Id);
+                await Groups.AddToGroupAsync(userConnection1.Last(), room.Id);
+                await Groups.AddToGroupAsync(userConnection2.Last(), room.Id);
 
                 var participant1 = new RandomPokemonDto
                 {
@@ -241,28 +241,50 @@ namespace PokemonGame.Hubs
                     }
 
                     var currRoom = await _roomBattleService.GetRoomBattle(room.Id);
-                    var participant = currRoom.Participants.First(x => x.UserName == defender.UserName);
-                    participant.CurrentPokemon.Stat.Hp = Math.Max(0, battleResult.DefenderHP);
-                    participant.pokemons = participant.pokemons
-                        .Select(x => x.Name == battleResult.Defender ? participant.CurrentPokemon : x)
+                    var participantDef = currRoom.Participants.First(x => x.UserName == defender.UserName);
+                    var participantAtk = currRoom.Participants.First(x => x.UserName == attacker.UserName);
+
+                    participantDef.CurrentPokemon.Stat.Hp = Math.Max(0, battleResult.DefenderHP);
+                    participantDef.pokemons = participantDef.pokemons
+                        .Select(x => x.Name == battleResult.Defender ? participantDef.CurrentPokemon : x)
+                        .ToList();
+
+                    participantAtk.CurrentPokemon.Moves = participantAtk.CurrentPokemon.Moves
+                        .Select(x => x.Id == battleResult.IdMoveUsed ? new MoveStateDto
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Type = x.Type,
+                            Power = x.Power,
+                            PP = --x.PP,
+                            OriginalPP = x.OriginalPP,
+                            Accuracy = x.Accuracy,
+                            Effect = x.Effect,
+                            ShortEffect = x.ShortEffect,
+                            MoveData = x.MoveData,
+                        } : x)
+                        .ToList();
+                    participantAtk.pokemons
+                        .Select(x => x.Name == battleResult.Attacker ? participantAtk.CurrentPokemon : x)
                         .ToList();
 
                     await _roomBattleService.UpdateRoomBattle(currRoom);
 
-                    if (battleResult.DefenderHP <= 0)
+                    await Clients.Group(room.Id).SendAsync("ReceiveBattleResult", battleResult);
+
+                    if(battleResult.DefenderHP <= 0)
                     {
-                        if (await _roomBattleService.SwitchRemainingPokemon(room.Id, defender.UserId, defender.pokemons))
-                        {
+                        if (await _roomBattleService.SwitchRemainingPokemon(room.Id, defender.UserId, participantDef.pokemons))
+                        {   
                             await Clients.Group(room.Id).SendAsync("SwitchPokemon", defender.UserName);
                         }
                         else
                         {
+                            await _roomBattleService.ExcuteWinner(room.Id, attacker.UserId);
                             await Clients.Group(room.Id).SendAsync("Finished", room.Id, attacker.UserName);
                             return;
                         }
                     }
-
-                    await Clients.Group(room.Id).SendAsync("ReceiveBattleResult", battleResult);
                 }
             }
 
@@ -341,6 +363,7 @@ namespace PokemonGame.Hubs
 
             //    await _roomBattleService.UpdateStatusRoomBattle(roomId, "Completed");
             //}
+            await _roomBattleService.RemoveUserConnection(username, connectionId);
 
             await Task.CompletedTask;
         }
