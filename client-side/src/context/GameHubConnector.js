@@ -73,6 +73,38 @@ class Connector {
                 });
     };
 
+    Attack = async (roomId, moveId) => {
+        const isConnected = this.checkConnected();
+
+        isConnected && await this.connection
+                .invoke("Attack", roomId, moveId)
+                .then(() => console.log("Attack success"))
+                .catch((err) => {
+                    console.error("Error when attack:", err)
+                });
+    };
+
+    ExecuteTurn = (executeTurn) => {
+        const isConnected = this.checkConnected();
+
+        isConnected && this.connection
+                .invoke("ExecuteTurn", executeTurn)
+                .then(() => console.log("Send execute success"))
+                .catch((err) => {
+                    console.error("Error when excute:", err)
+                });
+    };
+    ExecuteTurn2 = (executeTurn) => {
+        const isConnected = this.checkConnected();
+
+        isConnected && this.connection
+                .invoke("ExecuteTurn2", executeTurn)
+                .then(() => console.log("Send execute success"))
+                .catch((err) => {
+                    console.error("Error when excute:", err)
+                });
+    };
+
     static getInstance() {
         if (!Connector.instance) {
             Connector.instance = new Connector();

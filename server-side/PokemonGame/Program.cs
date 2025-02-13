@@ -142,6 +142,7 @@ builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddScoped<IPokemonService, PokemonService>();
 builder.Services.AddScoped<IRoomChatService, RoomChatService>();
 builder.Services.AddScoped<IRoomBattleService, RoomBattleService>();
+builder.Services.AddScoped<IMoveService, MoveService>();
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var databaseSetting = sp.GetRequiredService<IOptions<DatabaseSetting>>().Value;

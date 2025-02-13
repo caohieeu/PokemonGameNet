@@ -1,4 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using AutoMapper;
+using MongoDB.Driver;
+using PokemonGame.Dtos.RoomBattle;
 using PokemonGame.Models;
 using PokemonGame.Models.SubModel;
 using PokemonGame.Repositories.IRepository;
@@ -10,9 +12,16 @@ namespace PokemonGame.Services
     public class PokemonService : IPokemonService
     {
         private readonly IPokemonRepository _pokemonRepository;
-        public PokemonService(IPokemonRepository pokemonRepository)
+        private readonly IMoveService _moveService;
+        private readonly IMapper _mapper;
+        public PokemonService(
+            IPokemonRepository pokemonRepository, 
+            IMoveService moveService,
+            IMapper mapper)
         {
             _pokemonRepository = pokemonRepository;
+            _moveService = moveService;
+            _mapper = mapper;
         }
 
         public async Task<Pokemon> GetDetailPokemonAsync(int pokemonId)
@@ -33,20 +42,25 @@ namespace PokemonGame.Services
             return await _pokemonRepository.GetManyByFilter(page, pageSize, filter, Builders<Pokemon>.Sort.Ascending(x => x.Id));
         }
 
-        public async Task<List<Pokemon>> GetRandomPokemons()
+        public async Task<List<PokemonTeamDto>> GetRandomPokemons()
         {
-            List<Pokemon> pokemons = new List<Pokemon>();
+            List<PokemonTeamDto> pokemons = new List<PokemonTeamDto>();
             Random rnd = new Random();
 
             for(int i = 0; i < 4; i++)
             {
                 var idPokemon = rnd.Next(1, 919);
                 var pokemon = await GetDetailPokemonAsync(idPokemon);
+                var pokemonTeam = _mapper.Map<PokemonTeamDto>(pokemon);
 
-                pokemon.Moves = GetRandomMoves(pokemon, 4);
-                pokemon.Stat = RandomStat(pokemon);
+                var movesRand = await GetRandomMoves(pokemon, 4);
+                var statRand = RandomStat(pokemon);
 
-                pokemons.Add(pokemon);
+                pokemonTeam.Moves = movesRand;
+                pokemonTeam.Stat = statRand;
+                pokemonTeam.OriginalStat = statRand;
+
+                pokemons.Add(pokemonTeam);
             }
 
             return pokemons;
@@ -78,19 +92,23 @@ namespace PokemonGame.Services
 
             return pokemon.Stat;
         }
-        List<MovesPokemon> GetRandomMoves(Pokemon pokemon, int count)
+        async Task<List<MoveStateDto>> GetRandomMoves(Pokemon pokemon, int count)
         {
             var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
             Random rand = new Random();
             HashSet<int> ids = new HashSet<int>();
-            List<MovesPokemon> result = new List<MovesPokemon>();
+            List<MoveStateDto> result = new List<MoveStateDto>();
 
             while(ids.Count < moveIds.Count && ids.Count < count)
             {
-                int index = rand.Next(0, moveIds.Count);
+                int index = rand.Next(1, moveIds.Count);
                 if (ids.Add(moveIds[index]))
                 {
-                    result.Add(pokemon.Moves[index]);
+                    MovesPokemon movePk = pokemon.Moves[index];
+                    Moves move = await _moveService.GetMove(index);
+                    MoveStateDto moveSd = _moveService.TransformMove(move);
+
+                    result.Add(moveSd);
                 }
             }
 

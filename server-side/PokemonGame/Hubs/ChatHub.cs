@@ -215,11 +215,11 @@ namespace PokemonGame.Hubs
                 .Where(x => x.Name == "Lobby")
                 .Select(x => x.Id)
                 .FirstOrDefault() ?? "";
-            rmParticipant.UserId = user.Id;
+            rmParticipant.UserId = user?.Id;
 
             await _roomChatService.RemoveUserFromRoom(rmParticipant);
 
-            await Clients.All.SendAsync("UserDisconnected", user.UserName);
+            await Clients.All.SendAsync("UserDisconnected", user?.UserName);
 
             await base.OnDisconnectedAsync(exception);
         }

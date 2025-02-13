@@ -16,6 +16,12 @@ namespace PokemonGame.Utils.Mapper
             CreateMap<RoomChatCreateDto, RoomChat>().ReverseMap();
             CreateMap<Participant, InfoUserResponseDto>().ReverseMap();
             CreateMap<ParticipantRoomBattleDto, Pokemon>().ReverseMap();
+            CreateMap<MoveStateDto, MovesPokemon>()
+                .ForMember(ele => ele.Type, otp => otp.Ignore())
+                .ReverseMap();
+            CreateMap<PokemonTeamDto, Pokemon>()
+                .ForMember(ele => ele.Moves, otp => otp.Ignore())
+                .ReverseMap();
         }
     }
 }

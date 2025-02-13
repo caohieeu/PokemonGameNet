@@ -3,6 +3,9 @@ using PokemonGame.DAL;
 using PokemonGame.Dtos.Response;
 using PokemonGame.Dtos.RoomBattle;
 using PokemonGame.Exceptions;
+using PokemonGame.Models;
+using PokemonGame.Models.SubModel;
+using PokemonGame.Services;
 using PokemonGame.Services.IService;
 using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,6 +18,7 @@ namespace PokemonGame.Hubs
         private readonly IUserContext _userContext;
         private readonly IUserService _userService;
         private readonly IRoomBattleService _roomBattleService;
+        private readonly IMoveService _moveService;
 
         private static List<InfoUserResponseDto> waittingList = new List<InfoUserResponseDto>();
         private static readonly ConcurrentDictionary<string, string> UserRoomMapping = new();
@@ -22,11 +26,13 @@ namespace PokemonGame.Hubs
         public GameHub(
             IUserContext userContext, 
             IUserService userService,
-            IRoomBattleService roomBattleService)
+            IRoomBattleService roomBattleService,
+            IMoveService moveService)
         {
             _userContext = userContext;
             _userService = userService;
             _roomBattleService = roomBattleService;
+            _moveService = moveService;
         }
 
         public async Task<InfoUserResponseDto> GetUserFromContext()
@@ -99,8 +105,10 @@ namespace PokemonGame.Hubs
             {
                 var room = await _roomBattleService.AddRoomBattle();
 
-                await Groups.AddToGroupAsync(player1.UserName, room.Id);
-                await Groups.AddToGroupAsync(player2.UserName, room.Id);
+                var userConnection1 = _roomBattleService.GetUserConnections(player1.UserName);
+                var userConnection2 = _roomBattleService.GetUserConnections(player2.UserName);
+                await Groups.AddToGroupAsync(userConnection1.First(), room.Id);
+                await Groups.AddToGroupAsync(userConnection2.First(), room.Id);
 
                 var participant1 = new RandomPokemonDto
                 {
@@ -116,7 +124,9 @@ namespace PokemonGame.Hubs
                 var res1 = await _roomBattleService.AddParticipant(participant1);
                 var res2 = await _roomBattleService.AddParticipant(participant2);
 
-                if (!res1 && !res2)
+                var updateCurrentTurn = await _roomBattleService.UpdateCurrentTurn(room.Id, player1.UserName);
+
+                if (!res1 && !res2 && !updateCurrentTurn)
                 {
                     return;
                 }
@@ -143,11 +153,194 @@ namespace PokemonGame.Hubs
                 }
             }
         }
-        public async Task HandleUserDisconnectFromRoom(string roomId, string connectionId)
+        public void ExecuteTurn2(ExecuteTurnDto executeTurn)
+        {
+            Console.WriteLine($"ExecuteTurn called: {executeTurn.roomId}, {executeTurn.type}");
+        }
+        [HubMethodName("ExecuteTurn")]
+        public async Task ExecuteTurn(ExecuteTurnDto executeTurn)
+        {
+            var room = await _roomBattleService.GetRoomBattle(executeTurn.roomId);
+            //var connectionId = Context.ConnectionId;
+            //var usernamePlayer = _roomBattleService.GetUserFromConnection(connectionId);
+
+            var participant = room.Participants.FirstOrDefault(x => x.UserName == executeTurn.usernamePlayer);
+            if (participant == null) throw new NotFoundException("Player not found");
+
+            if (room.ActionQueue.Any(x => x.Player == executeTurn.usernamePlayer))
+                throw new Exception("You have already chosen an action!");
+
+            if (executeTurn.type == "Switch")
+            {
+                room.ActionQueue.Add(new ActionQueueDto
+                {
+                    Player = executeTurn.usernamePlayer,
+                    ActionType = "Switch",
+                    NewPokemonId = executeTurn.newPokemon,
+                });
+                await _roomBattleService.UpdateRoomBattle(room);
+            }
+            else if(executeTurn.type == "Attack")
+            {
+                var move = await _moveService.GetMove(executeTurn.moveId);
+                var moveSd = _moveService.TransformMove(move);
+
+                room.ActionQueue.Add(new ActionQueueDto
+                {
+                    Player = executeTurn.usernamePlayer,
+                    ActionType = "Attack",
+                    MoveId = executeTurn.moveId,
+                    Speed = (int)participant.CurrentPokemon.Stat.Speed,
+                });
+                await _roomBattleService.UpdateRoomBattle(room);
+            }
+            else
+            {
+                Console.WriteLine("Dau hang");
+            }
+
+            if(room.ActionQueue.Count == 2)
+            {
+                await ResolveTurn(room);
+            }
+        }
+        public async Task ResolveTurn(RoomBattle room)
+        {
+            var actions = room.ActionQueue.OrderByDescending(x => x.Speed)
+                .ToList();
+            
+            foreach(var action in actions)
+            {
+                var attacker = room.Participants.FirstOrDefault(x => x.UserName == action.Player);
+                var defender = room.Participants.FirstOrDefault(x => x.UserName != action.Player);
+
+                if(action.ActionType == "Switch")
+                {
+                    await SwitchPokemon(room, action.NewPokemonId, action.Player);
+
+                    await Clients.Group(room.Id).SendAsync("SwitchPokemon", defender.UserName);
+                }
+                else if(action.ActionType == "Attack")
+                {
+                    var move = await _moveService.GetMove(action.MoveId);
+                    var moveSd = _moveService.TransformMove(move);
+
+                    Random random = new Random();
+                    if(random.Next(100) >= moveSd.Accuracy)
+                    {
+                        await Clients.Group(room.Id).SendAsync("MissedAttack", attacker.UserName, moveSd.Name);
+                        continue;
+                    }
+
+                    var battleResult = await _roomBattleService.ApplyMove(attacker?.CurrentPokemon, defender?.CurrentPokemon, moveSd);
+
+                    if (battleResult == null)
+                    {
+                        Console.WriteLine("Battle Result is null");
+                        return;
+                    }
+
+                    var currRoom = await _roomBattleService.GetRoomBattle(room.Id);
+                    var participant = currRoom.Participants.First(x => x.UserName == defender.UserName);
+                    participant.CurrentPokemon.Stat.Hp = Math.Max(0, battleResult.DefenderHP);
+                    participant.pokemons = participant.pokemons
+                        .Select(x => x.Name == battleResult.Defender ? participant.CurrentPokemon : x)
+                        .ToList();
+
+                    await _roomBattleService.UpdateRoomBattle(currRoom);
+
+                    if (battleResult.DefenderHP <= 0)
+                    {
+                        if (await _roomBattleService.SwitchRemainingPokemon(room.Id, defender.UserId, defender.pokemons))
+                        {
+                            await Clients.Group(room.Id).SendAsync("SwitchPokemon", defender.UserName);
+                        }
+                        else
+                        {
+                            await Clients.Group(room.Id).SendAsync("Finished", room.Id, attacker.UserName);
+                            return;
+                        }
+                    }
+
+                    await Clients.Group(room.Id).SendAsync("ReceiveBattleResult", battleResult);
+                }
+            }
+
+            var roomUpdate = await _roomBattleService.GetRoomBattle(room.Id);
+            roomUpdate.ActionQueue.Clear();
+            await _roomBattleService.UpdateRoomBattle(roomUpdate);
+        }
+        public async Task SwitchPokemon(RoomBattle room, int newPokemon, string usernamePlayer)
+        {
+            var participant = room.Participants.First(x => x.UserName == usernamePlayer);
+
+            var switchPokemon = new SwitchPokemonDto()
+            {
+                RoomId = room.Id,
+                Player = participant.UserId,
+                NewPokemonId = newPokemon,
+            };
+
+            await _roomBattleService.SwitchPokemon(switchPokemon);
+        }
+        public async Task Attack(string roomId, int moveId)
         {
             var room = await _roomBattleService.GetRoomBattle(roomId);
 
-            room.Status = "Completed";
+            var connectionId = Context.ConnectionId;
+            var usernamePlayer = _roomBattleService.GetUserFromConnection(connectionId);
+            var participant = room.Participants.FirstOrDefault(x => x.UserName == usernamePlayer);
+
+            if(participant == null)
+            {
+                throw new NotFoundException($"{usernamePlayer} is not found in room");
+            }
+
+            if(room.CurrentTurn != participant.UserName)
+            {
+                throw new Exception("Not your turn");
+            }
+
+            var attacker = room.Participants.FirstOrDefault(x => x.UserName == participant.UserName);
+            var defender = room.Participants.FirstOrDefault(x => x.UserName != participant.UserName);
+
+            if(attacker == null && defender == null)
+                throw new Exception("Invalid participant");
+
+            var move = await _moveService.GetMove(moveId);
+            var moveSd = _moveService.TransformMove(move);
+
+            if (moveSd == null)
+                throw new Exception("Invalid move");
+
+            var battleResult = await _roomBattleService.ApplyMove(attacker?.CurrentPokemon, defender?.CurrentPokemon, moveSd);
+
+            if(battleResult.DefenderHP <= 0)
+            {
+                if(await _roomBattleService.SwitchRemainingPokemon(roomId, defender.UserId, defender.pokemons))
+                {
+                    await Clients.Group(roomId).SendAsync("SwitchPokemon", defender.UserName);
+                }
+                else
+                {
+                    await Clients.Group(roomId).SendAsync("Finished", roomId, attacker.UserName);
+                }
+            }
+
+            await Clients.Group(roomId).SendAsync("ReceiveBattleResult", battleResult);
+        }
+        public async Task HandleUserDisconnectFromRoom(string roomId, string connectionId)
+        {
+            var username = _roomBattleService.GetUserFromConnection(connectionId);
+            //var res = await _roomBattleService.UpdateStatusParticipant(roomId, username, 
+            //    Utils.Global.ParticipantStatus.OutRoom);
+
+            //if(res)
+            //{
+            //    var room = await _roomBattleService.GetRoomBattle(roomId);
+
+            //    await _roomBattleService.UpdateStatusRoomBattle(roomId, "Completed");
+            //}
 
             await Task.CompletedTask;
         }

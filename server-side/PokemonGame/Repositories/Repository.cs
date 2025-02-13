@@ -114,5 +114,11 @@ namespace PokemonGame.Repositories
                 return false;
             }
         }
+
+        public async Task<bool> ReplaceOneAsync(FilterDefinition<TEntity> filter, TEntity entity)
+        {
+            var result = await _collection.ReplaceOneAsync(filter, entity);
+            return result.ModifiedCount > 0;
+        }
     }
 }

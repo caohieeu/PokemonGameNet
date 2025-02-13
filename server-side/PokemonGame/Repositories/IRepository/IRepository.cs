@@ -14,5 +14,6 @@ namespace PokemonGame.Repositories.IRepository
         Task<bool> Add(TEntity entity);
         Task<bool> Remove(string id);
         Task<bool> UpdateOneByFilter(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update);
+        Task<bool> ReplaceOneAsync(FilterDefinition<TEntity> filter, TEntity entity);
     }
 }

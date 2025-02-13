@@ -34,6 +34,12 @@ namespace PokemonGame.Controllers
             var response = await _roomBattleService.RemoveRoomBattle(roomId);
             return Ok(new ApiResponse(200, "success", response));
         }
+        [HttpGet("GetParicipant")]
+        public async Task<IActionResult> GetParicipant([FromQuery] GetParticipantDto getParticipantDto)
+        {
+            var response = await _roomBattleService.GetParticipant(getParticipantDto.RoomId, getParticipantDto.UserName);
+            return Ok(new ApiResponse(200, "success", response));
+        }
         [HttpPost("AddParicipant")]
         public async Task<IActionResult> AddParicipant([FromBody] RandomPokemonDto randomPokemonDto)
         {

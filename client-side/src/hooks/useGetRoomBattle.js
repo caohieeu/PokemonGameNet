@@ -4,6 +4,9 @@ import { axiosInstance } from "../api/axiosClient";
 const useGetRoomBattle = (roomId = "") => {
     const [roomBattle, setRoomBattle] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [reloadTrigger, setReloadTrigger] = useState(0);
+
+    const reload = () => setReloadTrigger((prev) => prev + 1);
 
     useEffect(() => {
         setLoading(true);
@@ -18,9 +21,9 @@ const useGetRoomBattle = (roomId = "") => {
                 console.log(err.response?.data?.message || "Get room battle failed");
                 setLoading(false);
             });
-    }, [roomId]);
+    }, [roomId, reloadTrigger]);
 
-    return { roomBattle, loading };
+    return { roomBattle, loading, reload };
 };
 
 export default useGetRoomBattle;
