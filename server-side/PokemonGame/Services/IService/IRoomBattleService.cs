@@ -23,7 +23,7 @@ namespace PokemonGame.Services.IService
         Task<PokemonTeamDto> GetPokemonRoomBattle(string roomId, int pokemonId);
         Task<bool> SwitchPokemon(SwitchPokemonDto switchPokemon);
         Task<bool> SwitchRemainingPokemon(string roomId, string playerId, List<PokemonTeamDto> pokemons);
-        Task ExcuteWinner(string roomId, string userId);
+        Task ExcuteWinner(string roomId, string userName);
         Task<bool> UpdateCurrentTurn(string roomId, string username);
         Task<BattleResultDto> ApplyMove(PokemonTeamDto attacker,  PokemonTeamDto defender, MoveStateDto move);
     }

@@ -31,6 +31,9 @@ export default function BattleRoom() {
   const [opponent, setOpponent] = useState(null);
   const [currentPokemon, setCurrentPokemon] = useState(null);
   const [isPlayer, setIsPlayer] = useState(false);
+  const [damgePlayer, setDamagePlayer] = useState(null);
+  const [damgeOpponent, setDamageOpponent] = useState(null);
+  const [pendingBattleResult, setPendingBattleResult] = useState(null);
 
   const handleSwitch = (newPokemon) => {
     const connector = GameHubConnector;
@@ -85,14 +88,42 @@ export default function BattleRoom() {
   };
 
   const handleReceiveBattleResult = (battleResult) => {
+    if(!roomBattle || !user) {
+      setPendingBattleResult(battleResult);
+      return;
+    }
+
+    reload();
+
     console.log(battleResult)
-    setTimeout(reload(), 4000)
+    console.log("name" + roomBattle)
+    console.log("username: " + user.data.UserName)
+    var currentPlayer = roomBattle.Participants[0].UserName == user.data.UserName 
+        ? roomBattle.Participants[0] 
+        : roomBattle.Participants[1];
+
+    console.log(currentPlayer)
+
+    if(battleResult.attacker == currentPlayer.CurrentPokemon.Name)
+      setDamagePlayer(battleResult.damageDealt)
+    else
+      setDamageOpponent(battleResult.damageDealt)
+
+    setTimeout(() => {
+      setDamageOpponent(null)
+      setDamagePlayer(null)
+      reload();
+    }, 2000)
   }
 
   const handleMissedAttack = (username, moveName) => {
     // alert(`${username} missed ${moveName}`)
     setMissed(username)
-    reload();
+    
+    setTimeout(() => {
+      setMissed(null);
+      reload();
+    }, 2000);
   }
 
   const handleSwitchPokemon = (username) => {
@@ -103,6 +134,22 @@ export default function BattleRoom() {
   const handleFinished = (roomId, username) => {
     setTimeout(alert(`${username} win the game`), 2000)
   }
+
+  useEffect(() => {
+    if (roomBattle && user && pendingBattleResult) {
+        handleReceiveBattleResult(pendingBattleResult);
+        setPendingBattleResult(null);
+    }
+}, [roomBattle, user]);
+
+  useEffect(() => {
+    if(missed || damgeOpponent) {
+      setTimeout(() => {
+        setMissed(null);
+        setDamageOpponent(null);
+      }, 2000)
+    }
+  }, [missed, damgeOpponent])
 
   useEffect(() => {
     if (roomBattle?.Participants[0]?.UserName === user?.data?.UserName) {
@@ -190,6 +237,7 @@ export default function BattleRoom() {
                     className={`w-auto h-35 mr-4 ml-4 ${animationClass}`}
                   />
                   {missed == player?.UserName && <div className="miss-text-opponent">Miss</div>}
+                  {damgePlayer && <div className="damge-text-opponent">{damgePlayer}</div>}
                 </Popover>
                 {(attack == "Flamethrower") && (
                   <div>
@@ -224,6 +272,7 @@ export default function BattleRoom() {
                   className={`w-auto h-35 mr-4 ml-4 ${enemyAnimationClass}`}
                 />
                 {missed == opponent?.UserName && <div className="miss-text-player">Miss</div>}
+                {damgeOpponent && <div className="damge-text-player">{damgeOpponent}</div>}
               </div>
             </div>
           </div>

@@ -26,5 +26,16 @@
 
             return (int)Math.Max(1, totalDamage);
         }
+        public static int CalculateK(int point)
+        {
+            if (point <= 1600)
+                return 25;
+            else if (point <= 2000)
+                return 20;
+            else if (point <= 2400)
+                return 15;
+            else
+                return 10;
+        }
     }
 }

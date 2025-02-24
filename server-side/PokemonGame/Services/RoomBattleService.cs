@@ -241,11 +241,16 @@ namespace PokemonGame.Services
             return false;
         }
 
-        public async Task ExcuteWinner(string roomId, string userId)
+        public async Task ExcuteWinner(string roomId, string userNameWinner, int winnerPoint, int loserPoint)
         {
-            var room = await GetRoomBattle(roomId);
+            var k = Utils.Calculate.CalculateK(winnerPoint);
 
-            room.Winner = userId;
+            var room = await GetRoomBattle(roomId);
+            var user = await _userService.GetUserByUsername(userNameWinner);
+
+            user.Point += 
+
+            room.Winner = userNameWinner;
             room.Status = "Completed";
 
             var res = await UpdateRoomBattle(room);
