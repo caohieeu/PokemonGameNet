@@ -18,7 +18,7 @@ namespace PokemonGame.Models
         public HashSet<string> Roles { get; set; }
         //public long Point { get; set; }
         public List<TeamPokemonDto> Teams { get; set; } = null;
-        public long Point { get; set; } = 0;
+        public int Point { get; set; } = 0;
         [BsonElement("dateCreated"), BsonRepresentation(BsonType.DateTime)]
         public DateTime DateCreated { get; set; }
     }

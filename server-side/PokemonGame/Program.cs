@@ -150,6 +150,7 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
     return client.GetDatabase(databaseSetting.DatabaseName);
 });
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRankingService, RankingService>();
 
 //JWT
 var secretKey = builder.Configuration["AppSettings:SecretKey"];

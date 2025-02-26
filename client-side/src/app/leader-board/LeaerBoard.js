@@ -1,50 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Input, Card, Typography, Row, Col, Divider } from "antd";
 import { SearchOutlined, GoldOutlined, StarOutlined, TrophyOutlined } from '@ant-design/icons';
 import Header from "../Header";
+import useGetRankings from "../../hooks/useGetRankings";
 
 const { Title } = Typography;
 const { Search } = Input;
 
 const Leaderboard = () => {
+  const { rankings, reload } = useGetRankings();
+  
   const [searchTerm, setSearchTerm] = useState("");
-  const [players, setPlayers] = useState([
-    { name: "Ash Ketchum", score: 1500 },
-    { name: "Misty", score: 1400 },
-    { name: "Brock", score: 1300 },
-    { name: "Professor Oak", score: 1600 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-    { name: "Team Rocket", score: 1200 },
-  ]);
+  const [players, setPlayers] = useState(null);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
 
-  const filteredPlayers = players.filter((player) =>
-    player.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPlayers = players?.filter((player) =>
+    player?.UserName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getRankIcon = (rank) => {
@@ -59,6 +33,11 @@ const Leaderboard = () => {
         return null;
     }
   };
+
+  useEffect(() => {
+    console.log(rankings)
+    setPlayers(rankings);
+  }, [rankings])
 
   return (
     <div className="mx-1 md:mx-32">
@@ -98,15 +77,15 @@ const Leaderboard = () => {
                   },
                   {
                     title: "Player Name",
-                    dataIndex: "name",
-                    key: "name",
-                    sorter: (a, b) => a.name.localeCompare(b.name),
+                    dataIndex: "UserName",
+                    key: "UserName",
+                    sorter: (a, b) => a.UserName.localeCompare(b.UserName),
                   },
                   {
-                    title: "Score",
-                    dataIndex: "score",
-                    key: "score",
-                    sorter: (a, b) => a.score - b.score,
+                    title: "Point",
+                    dataIndex: "Point",
+                    key: "Point",
+                    sorter: (a, b) => a.Point - b.Point,
                     render: (text) => <strong>{text}</strong>,
                   },
                 ]}

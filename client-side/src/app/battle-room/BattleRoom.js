@@ -11,11 +11,42 @@ import useGetRoomBattle from '../../hooks/useGetRoomBattle';
 import { useParams } from "react-router-dom";
 import useUserInfo from '../../hooks/useUserInfo';
 import GameHubConnector from '../../context/GameHubConnector';
+import { typeColors } from "../../utils/TypeColors";
 
 const twoColors = {
   '0%': '#108ee9',
   '100%': '#87d068',
 };
+
+const getTypeColor = (type) => {
+  const typeColors = {
+    fire: "from-red-600 to-orange-500",
+    water: "from-blue-500 to-cyan-400",
+    grass: "from-green-500 to-lime-400",
+    electric: "from-yellow-400 to-yellow-600",
+    ice: "from-blue-300 to-blue-500",
+    psychic: "from-purple-500 to-pink-400",
+    normal: "from-gray-500 to-gray-700",
+    fighting: "from-red-700 to-orange-600",
+    ground: "from-yellow-700 to-brown-600",
+    flying: "from-indigo-500 to-blue-400",
+    bug: "from-green-600 to-yellow-400",
+    rock: "from-gray-600 to-gray-800",
+    ghost: "from-purple-700 to-black",
+    dark: "from-black to-gray-700",
+    dragon: "from-indigo-700 to-purple-500",
+    steel: "from-gray-500 to-gray-300",
+    fairy: "from-pink-400 to-pink-600"
+  };
+  return typeColors[type] || "from-gray-500 to-gray-700";
+};
+
+const DescriptionItem = ({ title, content }) => (
+  <div className="site-description-item-profile-wrapper mt-2">
+    <p className="site-description-item-profile-p-label">{title}:</p>
+    {content}
+  </div>
+);
 
 export default function BattleRoom() {
   const { roomId } = useParams();
@@ -88,7 +119,8 @@ export default function BattleRoom() {
   };
 
   const handleReceiveBattleResult = (battleResult) => {
-    if(!roomBattle || !user) {
+    console.log("Received battle result")
+    if (!roomBattle || !user) {
       setPendingBattleResult(battleResult);
       return;
     }
@@ -98,13 +130,13 @@ export default function BattleRoom() {
     console.log(battleResult)
     console.log("name" + roomBattle)
     console.log("username: " + user.data.UserName)
-    var currentPlayer = roomBattle.Participants[0].UserName == user.data.UserName 
-        ? roomBattle.Participants[0] 
-        : roomBattle.Participants[1];
+    var currentPlayer = roomBattle.Participants[0].UserName == user.data.UserName
+      ? roomBattle.Participants[0]
+      : roomBattle.Participants[1];
 
     console.log(currentPlayer)
 
-    if(battleResult.attacker == currentPlayer.CurrentPokemon.Name)
+    if (battleResult.attacker == currentPlayer.CurrentPokemon.Name)
       setDamagePlayer(battleResult.damageDealt)
     else
       setDamageOpponent(battleResult.damageDealt)
@@ -119,7 +151,7 @@ export default function BattleRoom() {
   const handleMissedAttack = (username, moveName) => {
     // alert(`${username} missed ${moveName}`)
     setMissed(username)
-    
+
     setTimeout(() => {
       setMissed(null);
       reload();
@@ -137,13 +169,13 @@ export default function BattleRoom() {
 
   useEffect(() => {
     if (roomBattle && user && pendingBattleResult) {
-        handleReceiveBattleResult(pendingBattleResult);
-        setPendingBattleResult(null);
+      handleReceiveBattleResult(pendingBattleResult);
+      setPendingBattleResult(null);
     }
-}, [roomBattle, user]);
+  }, [roomBattle, user, pendingBattleResult]);
 
   useEffect(() => {
-    if(missed || damgeOpponent) {
+    if (missed || damgeOpponent) {
       setTimeout(() => {
         setMissed(null);
         setDamageOpponent(null);
@@ -226,11 +258,60 @@ export default function BattleRoom() {
                   size={[200, 17]}
                 />
                 <Popover content={() => (
-                  <div>
-                    <p>Content</p>
-                    <p>Content</p>
+                  <div style={{
+                    borderTop: "1px solid #333"
+                  }}>
+                    <div>
+                      <DescriptionItem title="Type" content={opponent?.CurrentPokemon?.Type?.map((type, idx) => {
+                        return (
+                          <span
+                            key={idx}
+                            style={{
+                              backgroundColor: typeColors[type] || typeColors.Default,
+                              color: 'white',
+                              padding: '4px 8px',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                            }}
+                          >
+                            {type}
+                          </span>
+                        );
+                      })} />
+                    </div>
+                    <div className='flex '>
+                      <div className='pr-3'>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>hp: </p>
+                          <p>{opponent?.CurrentPokemon?.Stat?.Hp}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>atk: </p>
+                          <p>{opponent?.CurrentPokemon?.Stat?.Atk}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>defense: </p>
+                          <p>{opponent?.CurrentPokemon?.Stat?.Defense}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>sp atk: </p>
+                          <p>{opponent?.CurrentPokemon?.Stat?.SpAtk}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>sp def: </p>
+                          <p>{opponent?.CurrentPokemon?.Stat?.SpDef}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>speed: </p>
+                          <p>{opponent?.CurrentPokemon?.Stat?.Speed}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )} title="Title" trigger="hover">
+                )} title={opponent?.CurrentPokemon?.Name} trigger="hover">
                   <img
                     src={opponent?.CurrentPokemon?.Sprites?.Front}
                     alt="Charizard"
@@ -266,13 +347,67 @@ export default function BattleRoom() {
                   }}
                   size={[200, 17]}
                 />
-                <img
-                  src={player?.CurrentPokemon?.Sprites?.Back}
-                  alt={player?.CurrentPokemon?.Name}
-                  className={`w-auto h-35 mr-4 ml-4 ${enemyAnimationClass}`}
-                />
-                {missed == opponent?.UserName && <div className="miss-text-player">Miss</div>}
-                {damgeOpponent && <div className="damge-text-player">{damgeOpponent}</div>}
+                <Popover content={() => (
+                  <div style={{
+                    borderTop: "1px solid #333"
+                  }}>
+                    <DescriptionItem title="Type" content={player?.CurrentPokemon?.Type?.map((type, idx) => {
+                      return (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: typeColors[type] || typeColors.Default,
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                          }}
+                        >
+                          {type}
+                        </span>
+                      );
+                    })} />
+                    <div className='flex '>
+                      <div className='pr-3'>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>hp: </p>
+                          <p>{player?.CurrentPokemon?.Stat?.Hp}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>atk: </p>
+                          <p>{player?.CurrentPokemon?.Stat?.Atk}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>defense: </p>
+                          <p>{player?.CurrentPokemon?.Stat?.Defense}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>sp atk: </p>
+                          <p>{player?.CurrentPokemon?.Stat?.SpAtk}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>sp def: </p>
+                          <p>{player?.CurrentPokemon?.Stat?.SpDef}</p>
+                        </div>
+                        <div className='flex'>
+                          <p className='pr-2 font-bold'>speed: </p>
+                          <p>{player?.CurrentPokemon?.Stat?.Speed}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )} title={player?.CurrentPokemon?.Name} trigger="hover">
+                  <img
+                    src={player?.CurrentPokemon?.Sprites?.Back}
+                    alt={player?.CurrentPokemon?.Name}
+                    className={`w-auto h-35 mr-4 ml-4 ${enemyAnimationClass}`}
+                  />
+                  {missed == opponent?.UserName && <div className="miss-text-player">Miss</div>}
+                  {damgeOpponent && <div className="damge-text-player">{damgeOpponent}</div>}
+                </Popover>
               </div>
             </div>
           </div>
@@ -310,33 +445,41 @@ export default function BattleRoom() {
         <h3 className="text-lg font-semibold mb-4">Choose Your Pokémon</h3>
         <div className="grid grid-cols-2 gap-4 mb-6">
           {roomBattle?.Participants?.find(p => p.UserName === user?.data?.UserName)?.pokemons.map((item) => (
-            <button 
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+            <button
+              disabled={item?.Stat?.Hp > 0 ? false : true}
+              className={`${item?.Stat?.Hp > 0 ? "bg-blue-500" : "bg-gray-500"} text-white px-4 py-2 rounded`}
               onClick={() => handleSwitch(item?.Id)} >
-              {item?.Name}
+              <div className='flex items-center'>
+                <img
+                  src={item?.Sprites?.Image}
+                  alt={item?.Name}
+                  className={`w-10 h-35 mr-4 ml-4`}
+                />
+                <p>{item?.Name}</p>
+              </div>
             </button>
           ))}
         </div>
 
         <h3 className="text-lg font-semibold mb-4">Choose Attack</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 w-full bg-gray-900 p-4 rounded-lg border-2 border-gray-700">
           {roomBattle?.Participants?.find(p => p.UserName === user?.data?.UserName)?.CurrentPokemon?.Moves?.map((item) => (
             <button
-              disabled={item?.OriginalPP <= 0 ? true : false}
-              className={item?.OriginalPP <= 0 ? "bg-gray-500 text-white px-4 py-2 rounded" : "bg-green-500 text-white px-4 py-2 rounded"}
+              key={item.Name}
+              disabled={item?.OriginalPP <= 0}
+              className={`relative flex flex-col justify-between items-center h-16 p-3 rounded-md shadow-md text-white font-semibold transition-all duration-300
+        ${item?.OriginalPP <= 0 ? "bg-gray-500 cursor-not-allowed opacity-50" : `bg-gradient-to-b ${getTypeColor(item.Type)} hover:scale-105 hover:ring-2 hover:ring-white`}`}
               onClick={() => handleAttack(item)}
             >
-              <p className="text-black font-bold">{item.Name}</p>
-              <div className="flex justify-between">
-                {/* {item?.Type?.map((type) => (
-                  <p>{type}</p>
-                ))} */}
-                {item?.Type}
-                <p>{item?.PP}/{item?.OriginalPP}</p>
+              <p className="text-md">{item.Name}</p>
+              <div className="flex justify-between w-full text-sm">
+                <span className="bg-white/30 px-2 py-1 rounded">{item.Type}</span>
+                <p>{item.PP}/{item.OriginalPP}</p>
               </div>
             </button>
           ))}
-          {/* <button 
+        </div>
+        {/* <button 
             className="bg-green-500 text-white px-4 py-2 rounded"
             onClick={() => handleAttack('normal')}
             >
@@ -367,7 +510,6 @@ export default function BattleRoom() {
               </div>
           </button>
           <button className="bg-purple-500 text-white px-4 py-2 rounded">Electro Ball</button> */}
-        </div>
       </div>
     </div>
   )

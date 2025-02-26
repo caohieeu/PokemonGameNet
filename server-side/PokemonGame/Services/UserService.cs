@@ -42,7 +42,7 @@ namespace PokemonGame.Services
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllUser()
         {
-            return await _userRepository.GetAll(Builders<ApplicationUser>.Filter.Empty);
+            return await Task.FromResult(_userManager.Users.ToList());
         }
         public async Task<ApplicationUser> GetUserByUsernameAndPassword(SignInDto user)
         {
@@ -171,6 +171,20 @@ namespace PokemonGame.Services
             var usersReponse = users.Select(u => _mapper.Map<InfoUserResponseDto>(u)).ToList();
 
             return usersReponse;
+        }
+
+        public async Task<bool> UpdateUser(ApplicationUser user)
+        {
+            var res = await _userManager.UpdateAsync(user);
+
+            return res.Succeeded;
+        }
+
+        public async Task<ApplicationUser> GetUser(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+
+            return user;
         }
     }
 }

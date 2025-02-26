@@ -84,6 +84,20 @@ namespace PokemonGame.Hubs
 
             await CheckForMatch();
         }
+        async Task ReloadGroup(string userName1, string userName2, string roomId)
+        {
+            var userConnection1 = _roomBattleService.GetUserConnections(userName1);
+            var userConnection2 = _roomBattleService.GetUserConnections(userName2);
+
+            foreach (var conn in userConnection1)
+            {
+                await Groups.AddToGroupAsync(conn, roomId);
+            }
+            foreach (var conn in userConnection2)
+            {
+                await Groups.AddToGroupAsync(conn, roomId);
+            }
+        }
         public async Task CheckForMatch()
         {
             InfoUserResponseDto player1 = null;
@@ -107,7 +121,7 @@ namespace PokemonGame.Hubs
                 var userConnection1 = _roomBattleService.GetUserConnections(player1.UserName);
                 var userConnection2 = _roomBattleService.GetUserConnections(player2.UserName);
                 
-                foreach(var conn  in userConnection1)
+                foreach(var conn in userConnection1)
                 {
                     await Groups.AddToGroupAsync(conn, room.Id);
                 }
@@ -131,7 +145,7 @@ namespace PokemonGame.Hubs
                 var res2 = await _roomBattleService.AddParticipant(participant2);
 
                 var updateCurrentTurn = await _roomBattleService.UpdateCurrentTurn(room.Id, player1.UserName);
-
+                    
                 if (!res1 && !res2 && !updateCurrentTurn)
                 {
                     return;
@@ -167,8 +181,6 @@ namespace PokemonGame.Hubs
         public async Task ExecuteTurn(ExecuteTurnDto executeTurn)
         {
             var room = await _roomBattleService.GetRoomBattle(executeTurn.roomId);
-            //var connectionId = Context.ConnectionId;
-            //var usernamePlayer = _roomBattleService.GetUserFromConnection(connectionId);
 
             var participant = room.Participants.FirstOrDefault(x => x.UserName == executeTurn.usernamePlayer);
             if (participant == null) throw new NotFoundException("Player not found");
@@ -212,6 +224,8 @@ namespace PokemonGame.Hubs
         }
         public async Task ResolveTurn(RoomBattle room)
         {
+            await ReloadGroup(room.Participants[0].UserName, room.Participants[1].UserName, room.Id);
+
             var actions = room.ActionQueue.OrderByDescending(x => x.Speed)
                 .ToList();
             
@@ -238,7 +252,7 @@ namespace PokemonGame.Hubs
                         continue;
                     }
 
-                    var battleResult = await _roomBattleService.ApplyMove(attacker?.CurrentPokemon, defender?.CurrentPokemon, moveSd);
+                    var battleResult = await _roomBattleService.ApplyMove(attacker.CurrentPokemon, defender.CurrentPokemon, moveSd);
 
                     if (battleResult == null)
                     {
@@ -286,8 +300,8 @@ namespace PokemonGame.Hubs
                         }
                         else
                         {
-                            await _roomBattleService.ExcuteWinner(room.Id, attacker.UserName);
                             await Clients.Group(room.Id).SendAsync("Finished", room.Id, attacker.UserName);
+                            await _roomBattleService.ExcuteWinner(room.Id, attacker.UserName, defender.UserName);
                             return;
                         }
                     }
@@ -360,16 +374,8 @@ namespace PokemonGame.Hubs
         public async Task HandleUserDisconnectFromRoom(string connectionId)
         {
             var username = _roomBattleService.GetUserFromConnection(connectionId);
-            //var res = await _roomBattleService.UpdateStatusParticipant(roomId, username, 
-            //    Utils.Global.ParticipantStatus.OutRoom);
 
-            //if(res)
-            //{
-            //    var room = await _roomBattleService.GetRoomBattle(roomId);
-
-            //    await _roomBattleService.UpdateStatusRoomBattle(roomId, "Completed");
-            //}
-            var connections = _roomBattleService.GetUserConnections(username);
+            var connections = _roomBattleService.GetUserConnections(username).ToList();
             foreach (var connection in connections)
             {
                 await _roomBattleService.RemoveUserConnection(username, connection);
@@ -377,13 +383,30 @@ namespace PokemonGame.Hubs
 
             await Task.CompletedTask;
         }
-        public override async Task OnDisconnectedAsync(Exception? exception)
+        public override async Task OnConnectedAsync()
         {
+            var currUser = await GetUserFromContext();
             var connectionId = Context.ConnectionId;
 
-            if(UserRoomMapping.TryRemove(connectionId, out var roomId)) {
+            await _roomBattleService.AddUserToConnection(currUser.UserName, connectionId);
+
+            await base.OnConnectedAsync();
+        }
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var currUser = await GetUserFromContext();
+
+            var connections = _roomBattleService.GetUserConnections(currUser.UserName).ToList();
+
+           foreach(var connectionId in connections)
+            {
                 await HandleUserDisconnectFromRoom(connectionId);
-            }
+            } 
+           
+            //if (UserRoomMapping.TryRemove(connectionId, out var roomId))
+            //{
+            //    await HandleUserDisconnectFromRoom(connectionId);
+            //}  
 
             await base.OnDisconnectedAsync(exception);
         }

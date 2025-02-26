@@ -1,4 +1,6 @@
-﻿namespace PokemonGame.Utils
+﻿using Amazon.Runtime.Internal.Util;
+
+namespace PokemonGame.Utils
 {
     public class Calculate
     {
@@ -36,6 +38,29 @@
                 return 15;
             else
                 return 10;
+        }
+        public static double CalculateEloRating(int pointA, int pointB, bool returnForA)
+        {
+            var Qa = Math.Pow(10, pointA / 400);
+            var Qb = Math.Pow(10, pointB / 400);
+
+            if(returnForA)
+                return (1.0 * Qa) / (Qa + Qb);
+            else
+                return (1.0 * Qb) / (Qa + Qb);
+        }
+        public static int CalculatePointAfterMatch(int winnerPoint, int loserPoint, bool isWin)
+        {
+            var newPoint = isWin ? winnerPoint : loserPoint;
+            var otherPoint = isWin ? loserPoint : winnerPoint;
+            var k = CalculateK(newPoint);
+            var E = CalculateEloRating(newPoint, otherPoint, true);
+            var A = isWin ? 1 : 0;
+
+            //R' = R + K(A - E)
+            newPoint = (int)Math.Ceiling(newPoint + k * (A - E));
+
+            return newPoint;
         }
     }
 }

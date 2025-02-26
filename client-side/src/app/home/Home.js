@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../Header";
 import { Carousel, Card, List } from "antd";
+import ImageBattle from "../../assets/img/game_battle.png"
 
 export default function Home() {
   const announcements = [
@@ -31,8 +32,22 @@ export default function Home() {
 
       <div className="mt-8 px-4">
         <Carousel autoplay>
-          <div className="h-64 bg-gradient-to-r from-yellow-400 to-red-500 flex items-center justify-center">
-            <h2 className="text-white text-3xl font-bold">Choose your favorite Pokémon!</h2>
+          <div 
+            className="h-100 bg-gradient-to-r from-yellow-400 to-red-500 flex items-center justify-center"
+            style={{
+                position: "absolute"
+            }} >
+            <h2 className="text-white text-3xl font-bold" style={{
+              position: "relative",
+              top: 0,
+              left: 100
+            }}>Choose your favorite Pokémon!</h2>
+            <img
+              style={{
+                width: "100%",
+              }} 
+              src={ImageBattle}
+            />
           </div>
           <div className="h-64 bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center">
             <h2 className="text-white text-3xl font-bold">Join exciting PvP tournaments!</h2>

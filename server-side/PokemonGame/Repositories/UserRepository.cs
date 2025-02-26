@@ -122,7 +122,8 @@ namespace PokemonGame.Repositories
                 DisplayName = signUpDto.DisplayName,
                 PhoneNumber = signUpDto.PhoneNumber,
                 ImagePath = filePath,
-                DateCreated = DateTime.Now, 
+                Point = 500,
+                DateCreated = DateTime.Now,
             };
 
             var result = await _userManager.CreateAsync(user, signUpDto.Password);

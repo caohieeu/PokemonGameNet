@@ -16,7 +16,7 @@ namespace PokemonGame.Dtos.Response
         public HashSet<string> Roles { get; set; }
         public List<string> Moves { get; set; } = null;
         public List<TeamPokemonDto> Teams { get; set; } = null;
-        public long Point { get; set; }
+        public int Point { get; set; }
         public DateTime DateCreated { get; set; }
     }
 }
