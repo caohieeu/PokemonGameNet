@@ -1,4 +1,4 @@
-﻿using PokemonGame.Dtos.Rank;
+﻿using PokemonGame.Core.Models.Dtos.Rank;
 using PokemonGame.Services.IService;
 
 namespace PokemonGame.Services

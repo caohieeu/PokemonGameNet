@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PokemonGame.Dtos.RoomBattle;
-using PokemonGame.Models.Response;
+using PokemonGame.Core.Models.Dtos.RoomBattle;
+using PokemonGame.Core.Models.Response;
 using PokemonGame.Services;
 using PokemonGame.Services.IService;
 

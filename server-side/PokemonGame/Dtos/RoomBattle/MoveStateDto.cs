@@ -1,5 +1,5 @@
-﻿using PokemonGame.Models;
-using PokemonGame.Models.SubModel;
+﻿using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Models.SubModel;
 
 namespace PokemonGame.Dtos.RoomBattle
 {

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using MongoDB.Driver;
-using PokemonGame.Dtos;
-using PokemonGame.Dtos.Response;
+using PokemonGame.Core.Models.Dtos;
+using PokemonGame.Core.Models.Dtos.Response;
 using PokemonGame.Exceptions;
-using PokemonGame.Models;
+using PokemonGame.Core.Models.Entities;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace PokemonGame.DAL

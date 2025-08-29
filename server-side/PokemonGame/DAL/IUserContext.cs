@@ -1,4 +1,4 @@
-﻿using PokemonGame.Dtos.Response;
+﻿using PokemonGame.Core.Models.Dtos.Response;
 
 namespace PokemonGame.DAL
 {

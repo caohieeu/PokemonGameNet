@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using MongoDB.Driver;
-using PokemonGame.Dtos.RoomBattle;
-using PokemonGame.Models;
-using PokemonGame.Models.SubModel;
+using PokemonGame.Core.Models.Dtos.RoomBattle;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Models.SubModel;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Services.IService;
 using PokemonGame.Settings;
+using PokemonGame.Core.Helpers;
+using PokemonGame.Core.Constants;
 
 namespace PokemonGame.Services
 {
@@ -34,7 +36,7 @@ namespace PokemonGame.Services
         public async Task<PaginationModel<Pokemon>> GetPokemonAsync(int page, int pageSize, string namePokemon)
         {
             FilterDefinition<Pokemon> filter = null;
-            if(namePokemon != null)
+            if(string.IsNullOrEmpty(namePokemon))
                 filter = Builders<Pokemon>.Filter.Regex(x => x.Name, new MongoDB.Bson.BsonRegularExpression(namePokemon, "i"));
             else
                 filter = Builders<Pokemon>.Filter.Empty;
@@ -58,21 +60,26 @@ namespace PokemonGame.Services
 
                 movesRand.ForEach(x => x.OriginalPP = (int)x.PP);
                 pokemonTeam.Moves = movesRand.ToList();
-                pokemonTeam.Stat = statRand;
-                pokemonTeam.OriginalStat = statRand;
+                pokemonTeam.Stat = statRand ?? pokemonTeam.Stat;
+                pokemonTeam.OriginalStat = statRand ?? pokemonTeam.OriginalStat;
 
                 pokemons.Add(pokemonTeam);
             }
 
             return pokemons;
         }
-        Stat RandomStat(Pokemon pokemon)
+        Stat? RandomStat(Pokemon pokemon)
         {
+            if(pokemon == null)
+            {
+                return null;
+            }
+
             Random rnd = new Random();
-            var totalStat = Utils.Global.Global.TotalStat;
-            var maxStatLimit = 252;
+            var totalStatLimit = GameDefault.POKEMON_TOTAL_STAT_LIMIT;
+            var maxStatLimit = GameDefault.MAX_STAT_LIMIT;
             var totalRemaning = (int)(pokemon.Stat.Atk + pokemon.Stat.Defense +
-                pokemon.Stat.SpAtk + pokemon.Stat.SpDef + pokemon.Stat.Speed + totalStat);
+                pokemon.Stat.SpAtk + pokemon.Stat.SpDef + pokemon.Stat.Speed + totalStatLimit);
 
             pokemon.Stat.Hp = rnd.Next(0, Math.Min(totalRemaning, maxStatLimit));
             totalRemaning -= (int)pokemon.Stat.Hp;
@@ -95,7 +102,11 @@ namespace PokemonGame.Services
         }
         async Task<List<MoveStateDto>> GetRandomMoves(Pokemon pokemon, int count)
         {
-            var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
+            //var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
+            var moveIds = (await _pokemonRepository
+                        .GetFieldValueAsync(x => x.Moves.Select(m => (int)m.Id)))
+                        .SelectMany(ids => ids)
+                        .ToList();
             Random rand = new Random();
             HashSet<int> ids = new HashSet<int>();
             List<MoveStateDto> result = new List<MoveStateDto>();

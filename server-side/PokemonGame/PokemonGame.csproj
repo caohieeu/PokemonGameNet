@@ -1,10 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Dtos\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Utils\**" />
+    <Content Remove="Dtos\**" />
+    <Content Remove="Models\**" />
+    <Content Remove="Utils\**" />
+    <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Utils\**" />
+    <None Remove="Dtos\**" />
+    <None Remove="Models\**" />
+    <None Remove="Utils\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="6.0.0" />
@@ -18,8 +33,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\Request\" />
     <Folder Include="wwwroot\Images\Avatars\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PokemonGame.Core">
+      <HintPath>..\PokemonGame.Core\bin\Debug\net8.0\PokemonGame.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

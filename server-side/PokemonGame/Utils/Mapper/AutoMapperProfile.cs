@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using PokemonGame.Dtos.Response;
-using PokemonGame.Dtos.RoomBattle;
-using PokemonGame.Dtos.RoomChat;
-using PokemonGame.Models;
-using PokemonGame.Models.SubModel;
+using PokemonGame.Core.Models.Dtos.Response;
+using PokemonGame.Core.Models.Dtos.RoomBattle;
+using PokemonGame.Core.Models.Dtos.RoomChat;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Models.SubModel;
 
 namespace PokemonGame.Utils.Mapper
 {

@@ -1,11 +1,12 @@
 ﻿using MongoDB.Driver;
-using PokemonGame.Dtos.RoomBattle;
+using PokemonGame.Core.Models.Dtos.RoomBattle;
 using PokemonGame.Exceptions;
-using PokemonGame.Models;
+using PokemonGame.Core.Models.Entities;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Services.IService;
-using PokemonGame.Utils.Global;
+using PokemonGame.Core.Helpers;
 using System.Text.RegularExpressions;
+using PokemonGame.Core.Enum;
 
 namespace PokemonGame.Services
 {
@@ -101,9 +102,9 @@ namespace PokemonGame.Services
         }
         public PokemonTeamDto ProcessNormalMove(PokemonTeamDto atkPokemon, PokemonTeamDto defPokemon, MoveStateDto move)
         {
-            var damage = Utils.Calculate.CalculateDamage(100, move.Power, atkPokemon.Stat.Atk,
+            var damage = CalculateHelper.CalculateDamage(100, move.Power, atkPokemon.Stat.Atk,
                 defPokemon.Stat.Defense, calculateStab(atkPokemon.Type, move.Type), 
-                Utils.TypeEffectiveness.GetEffectiveness(atkPokemon.Type.First(), defPokemon.Type), false);
+                TypeEffectivenessHelper.GetEffectiveness(atkPokemon.Type.First(), defPokemon.Type), false);
 
             defPokemon.Stat.Hp -= damage;
 

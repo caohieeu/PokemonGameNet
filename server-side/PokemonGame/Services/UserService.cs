@@ -1,16 +1,17 @@
 ﻿using MongoDB.Driver;
-using PokemonGame.Dtos.Auth;
-using PokemonGame.Models;
+using PokemonGame.Core.Models.Dtos.Auth;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Services.IService;
 using PokemonGame.Exceptions;
 using Microsoft.AspNetCore.Identity;
-using PokemonGame.Dtos.Response;
+using PokemonGame.Core.Models.Dtos.Response;
 using PokemonGame.DAL;
 using AutoMapper;
-using PokemonGame.Models.SubModel;
-using PokemonGame.Dtos.Pokemon;
+using PokemonGame.Core.Models.SubModel;
+using PokemonGame.Core.Models.Dtos.Pokemon;
 using MongoDB.Bson;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Constants;
 
 namespace PokemonGame.Services
 {
@@ -19,7 +20,6 @@ namespace PokemonGame.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IUserContext _userContext;
-        private readonly IPokemonService _pokeService;
         private readonly IPokemonRepository _pokeRepository;
         private readonly IMoveRepository _moveRepository;
         private readonly IMapper _mapper;
@@ -28,13 +28,11 @@ namespace PokemonGame.Services
             IUserRepository userRepository,
             IPokemonRepository pokeRepository,
             IMoveRepository moveRepository,
-            IPokemonService pokeService,
             IUserContext userContext,
             IMapper mapper)
         {
             _userRepository = userRepository;
             _userContext = userContext;
-            _pokeService = pokeService;
             _pokeRepository = pokeRepository;
             _moveRepository = moveRepository;
             _userManager = userManager;
@@ -102,7 +100,7 @@ namespace PokemonGame.Services
                 poke.Stat.Defense + poke.Stat.SpAtk +
                 poke.Stat.SpDef + poke.Stat.Speed;
 
-                if (additionStat > Utils.Global.Global.TotalStat)
+                if (additionStat > GameDefault.POKEMON_TOTAL_STAT_LIMIT)
                 {
                     throw new BadRequestException("Exceeding the permissible limit");
                 }
@@ -165,7 +163,7 @@ namespace PokemonGame.Services
         public List<InfoUserResponseDto> GetUsers(string userName)
         {
             var users = _userManager.Users
-                .Where(u => u.UserName.Contains(userName))
+                .Where(u => !string.IsNullOrEmpty(u.UserName) && u.UserName.Contains(userName))
                 .ToList();
 
             var usersReponse = users.Select(u => _mapper.Map<InfoUserResponseDto>(u)).ToList();

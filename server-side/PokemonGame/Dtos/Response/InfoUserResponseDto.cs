@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using PokemonGame.Models;
+using PokemonGame.Core.Models;
 using PokemonGame.Dtos.Pokemon;
 
 namespace PokemonGame.Dtos.Response

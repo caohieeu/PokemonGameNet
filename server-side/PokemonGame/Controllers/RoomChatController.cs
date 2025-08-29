@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PokemonGame.Dtos.RoomChat;
-using PokemonGame.Models.Response;
+using PokemonGame.Core.Models.Dtos.RoomChat;
+using PokemonGame.Core.Models.Response;
 using PokemonGame.Services.IService;
 
 namespace PokemonGame.Controllers

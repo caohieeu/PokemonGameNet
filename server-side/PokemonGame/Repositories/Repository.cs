@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using System.Linq.Expressions;
+using MongoDB.Driver;
 using PokemonGame.DAL;
 using PokemonGame.Exceptions;
 using PokemonGame.Repositories.IRepository;
@@ -119,6 +120,16 @@ namespace PokemonGame.Repositories
         {
             var result = await _collection.ReplaceOneAsync(filter, entity);
             return result.ModifiedCount > 0;
+        }
+        public async Task<IEnumerable<TResult>> GetFieldValueAsync<TResult>(Expression<Func<TEntity, TResult>> fieldSelector, 
+            FilterDefinition<TEntity>? filter = null)
+        {
+            var effectiveFilter = filter ?? Builders<TEntity>.Filter.Empty;
+            return await _collection
+                .Find(effectiveFilter)
+                .Project(fieldSelector)
+                .ToListAsync();
+
         }
     }
 }

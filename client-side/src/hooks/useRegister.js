@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 const useRegister = () => {
     const navigate = useNavigate();
     const register = async (userData) => {
-        console.log(userData);
         try {
             userData.Role = "Player"
             const response = await axiosInstance.post("User/SignUp", userData, {
@@ -22,13 +21,14 @@ const useRegister = () => {
             navigate("/login");
             return response.data;
         } catch (err) {
+            const errorMessage = err?.response?.data?.message;
+            
             notification.open({
-                message: err.response?.data?.message || 'Register failed',
+                message: errorMessage || 'Register failed',
                 type: "error",
                 showProgress: true,
                 pauseOnHover: false,
             });
-            console.log(err);
         }
     };
 

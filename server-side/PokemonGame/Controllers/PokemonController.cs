@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PokemonGame.Models.Response;
+using PokemonGame.Core.Models.Response;
 using PokemonGame.Services.IService;
 
 namespace PokemonGame.Controllers

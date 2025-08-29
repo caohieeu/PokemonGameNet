@@ -1,6 +1,6 @@
-﻿using PokemonGame.Dtos.RoomBattle;
-using PokemonGame.Dtos.RoomChat;
-using PokemonGame.Models;
+﻿using PokemonGame.Core.Models.Dtos.RoomBattle;
+using PokemonGame.Core.Models.Dtos.RoomChat;
+using PokemonGame.Core.Models.Entities;
 
 namespace PokemonGame.Services.IService
 {

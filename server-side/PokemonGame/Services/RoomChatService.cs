@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using MongoDB.Driver;
-using PokemonGame.Dtos.RoomChat;
+using PokemonGame.Core.Models.Dtos.RoomChat;
 using PokemonGame.Exceptions;
-using PokemonGame.Models;
-using PokemonGame.Models.SubModel;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Models.SubModel;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Services.IService;
+using PokemonGame.Core.Constants;
 
 namespace PokemonGame.Services
 {
@@ -53,7 +54,7 @@ namespace PokemonGame.Services
         }
         public async Task<bool> AddUserToRoom(JoinRoomDto joinRoomDto)
         {
-            if(string.IsNullOrEmpty(joinRoomDto.RoomChatID) || joinRoomDto.Participant == null)
+            if(joinRoomDto.Participant == null || string.IsNullOrEmpty(joinRoomDto.RoomChatID))
             {
                 return false;
             }
@@ -64,7 +65,7 @@ namespace PokemonGame.Services
 
             if(!room)
             {
-                throw new NotFoundException("Room chat not found");
+                throw new NotFoundException(ExceptionMessage.ROOM_BATTLE_NOT_FOUND);
             }
 
             if (await IsExistParticipant(joinRoomDto.RoomChatID, joinRoomDto.Participant.UserId))
@@ -86,7 +87,7 @@ namespace PokemonGame.Services
 
             if (!room)
             {
-                throw new NotFoundException("Room chat not found");
+                throw new NotFoundException(ExceptionMessage.ROOM_CHAT_NOT_FOUND);
             }
 
             var builder = Builders<RoomChat>.Update;
@@ -127,21 +128,13 @@ namespace PokemonGame.Services
         {
 
             var room = await GetRoomChat(roomId);
-
             return room.Participants;
         }
 
         public async Task<RoomChat> GetRoomChat(string roomId)
         {
-            try
-            {
-                FilterDefinition<RoomChat> filter = Builders<RoomChat>.Filter.Eq(x => x.Id, roomId);
-                return await _roomChatRepository.GetByFilter(filter);
-            }
-            catch
-            {
-                throw new NotFoundException($"{roomId} is doesnt exist");
-            }
+            FilterDefinition<RoomChat> filter = Builders<RoomChat>.Filter.Eq(x => x.Id, roomId);
+            return await _roomChatRepository.GetByFilter(filter);
         }
     }
 }

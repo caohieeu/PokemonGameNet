@@ -1,6 +1,6 @@
 ﻿namespace PokemonGame.Dtos.RoomBattle
 {
-    public class CurrentPokemonDto : Models.Pokemon
+    public class CurrentPokemonDto : Core.Models.Entities.Pokemon
     {
 
     }

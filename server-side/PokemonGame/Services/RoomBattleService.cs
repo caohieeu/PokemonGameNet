@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using MongoDB.Driver;
-using PokemonGame.Dtos.RoomBattle;
-using PokemonGame.Dtos.RoomChat;
+using PokemonGame.Core.Models.Dtos.RoomBattle;
 using PokemonGame.Exceptions;
-using PokemonGame.Models;
-using PokemonGame.Models.SubModel;
-using PokemonGame.Repositories;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Models.SubModel;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Services.IService;
-using PokemonGame.Utils.Global;
+using PokemonGame.Core.Helpers;
+using PokemonGame.Core.Constants;
 
 namespace PokemonGame.Services
 {
@@ -69,7 +68,7 @@ namespace PokemonGame.Services
             var room = new RoomBattle
             {
                 Participants = new List<ParticipantRoomBattleDto>(),
-                Status = "InProgress",
+                Status = ParticipantStatus.IN_PROGRESS,
                 ActionLog = new ActionLog(),
                 CurrentTurn = "",
                 DateCreated = DateTime.Now,
@@ -91,7 +90,7 @@ namespace PokemonGame.Services
 
             if(user == null)
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(ExceptionMessage.USER_NOT_FOUND);
             }
 
             var pokemons = await _pokemonService.GetRandomPokemons();
@@ -101,7 +100,7 @@ namespace PokemonGame.Services
             participant.UserName = user.UserName;
             participant.Avatar = user.ImagePath;
             participant.pokemons = pokemons;
-            participant.Status = Utils.Global.ParticipantStatus.InRoom;
+            participant.Status = ParticipantStatus.IN_ROOM;
             participant.CurrentPokemon = pokemons[0];
 
             var filter = Builders<RoomBattle>.Filter.Eq(x => x.Id, randomPokemonDto.BattleId);
@@ -109,7 +108,7 @@ namespace PokemonGame.Services
 
             if (!room)
             {
-                throw new NotFoundException("Room battle not found");
+                throw new NotFoundException(ExceptionMessage.ROOM_BATTLE_NOT_FOUND);
             }
 
             var builder = Builders<RoomBattle>.Update;
@@ -251,11 +250,11 @@ namespace PokemonGame.Services
             room.Status = "Completed";
 
             //update point for winner
-            winner.Point = Utils.Calculate.CalculatePointAfterMatch(winner.Point, loser.Point, true);
+            winner.Point = CalculateHelper.CalculatePointAfterMatch(winner.Point, loser.Point, true);
             await _userService.UpdateUser(winner);
 
             //update point for loser
-            loser.Point = Utils.Calculate.CalculatePointAfterMatch(winner.Point, loser.Point, false);
+            loser.Point = CalculateHelper.CalculatePointAfterMatch(winner.Point, loser.Point, false);
             await _userService.UpdateUser(loser);
 
             var res = await UpdateRoomBattle(room);
@@ -283,9 +282,9 @@ namespace PokemonGame.Services
                 IdMoveUsed = move.Id
             };
 
-            double damage = Utils.Calculate.CalculateDamage(100, move.Power, attacker.Stat.Atk,
-                defender.Stat.Defense, Utils.Calculate.calculateStab(attacker.Type, move.Type),
-                Utils.TypeEffectiveness.GetEffectiveness(attacker.Type.First(), defender.Type), false);
+            double damage = CalculateHelper.CalculateDamage(100, move.Power, attacker.Stat.Atk,
+                defender.Stat.Defense, CalculateHelper.calculateStab(attacker.Type, move.Type),
+                TypeEffectivenessHelper.GetEffectiveness(attacker.Type.First(), defender.Type), false);
 
             //var cateMove = _moveService.FilterMove(move.Effect);
 

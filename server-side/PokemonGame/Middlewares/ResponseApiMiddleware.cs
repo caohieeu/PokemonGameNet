@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PokemonGame.Exceptions;
-using PokemonGame.Models.Response;
+using PokemonGame.Core.Models.Response;
 using System.Net;
 
 namespace PokemonGame.Middlewares

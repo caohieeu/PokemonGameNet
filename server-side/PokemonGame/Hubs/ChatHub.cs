@@ -1,38 +1,27 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.IdentityModel.Tokens;
 using PokemonGame.DAL;
-using PokemonGame.Dtos.Response;
-using PokemonGame.Dtos.RoomChat;
+using PokemonGame.Core.Models.Dtos.Response;
+using PokemonGame.Core.Models.Dtos.RoomChat;
 using PokemonGame.Exceptions;
-using PokemonGame.Models.SubModel;
-using PokemonGame.Repositories.IRepository;
+using PokemonGame.Core.Models.SubModel;
 using PokemonGame.Services.IService;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.InteropServices;
-using System.Security.Claims;
 
 namespace PokemonGame.Hubs
 {
-    public class ChatHub : Hub
+    public class ChatHub : BaseHub<ChatHub>
     {
         private readonly IRoomChatService _roomChatService;
-        private readonly IUserService _userService;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IUserContext _userContext;
-        private readonly IMapper _mapper;
         public ChatHub(
             IRoomChatService roomChatService, 
             IUserService userService,
             IHttpContextAccessor contextAccessor,
             IUserContext userContext,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<ChatHub> logger) : base(userService, contextAccessor, userContext, mapper, logger)
         {
             _roomChatService = roomChatService;
-            _userService = userService;
-            _contextAccessor = contextAccessor;
-            _userContext = userContext;
-            _mapper = mapper;
         }
         public async Task SendMessageToAllUser(string username, string message)
         {
@@ -133,23 +122,31 @@ namespace PokemonGame.Hubs
                 throw new Exception("Token not found in Authorization header.");
             }
 
-            if (!_userContext.CheckToken(token))
+            try
             {
+                if (_userContext.CheckToken(token))
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
+
+                    var username = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "UserName")?.Value;
+                    if (string.IsNullOrEmpty(username))
+                    {
+                        throw new NotFoundException("UserName is not found in token claims");
+                    }
+
+                    user = await _userService.GetUserByUsername(username);
+
+                    return user;
+                }
+                else
+                    return null;
+            } catch (Exception ex)
+            {
+                _logger.LogWarning(ex.Message);
+
                 return null;
             }
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-
-            var username = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "UserName")?.Value;
-            if (string.IsNullOrEmpty(username))
-            {
-                throw new NotFoundException("UserName is not found in token claims");
-            }
-
-            user = await _userService.GetUserByUsername(username);
-
-            return user;
         }
         public override async Task OnConnectedAsync()
         {

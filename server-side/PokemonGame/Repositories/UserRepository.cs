@@ -3,15 +3,16 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
 using PokemonGame.DAL;
-using PokemonGame.Dtos.Auth;
+using PokemonGame.Core.Models.Dtos.Auth;
 using PokemonGame.Exceptions;
-using PokemonGame.Models;
+using PokemonGame.Core.Models.Entities;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Settings;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using PokemonGame.Core.Constants;
 
 namespace PokemonGame.Repositories
 {
@@ -61,6 +62,11 @@ namespace PokemonGame.Repositories
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public Task<IEnumerable<object>> GetRankings()
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<AuthDto> SignIn(SignInDto user)
@@ -141,7 +147,9 @@ namespace PokemonGame.Repositories
             }
             else
             {
-                throw new BadRequestException($"Failed to create account: {JsonSerializer.Serialize(result)}");
+                string returnMessage = string.Join('\n', result.Errors.Select(err => err.Description));
+
+                throw new BadRequestException(returnMessage);
             }
 
             return true;

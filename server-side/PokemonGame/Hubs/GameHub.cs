@@ -1,22 +1,18 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using PokemonGame.DAL;
-using PokemonGame.Dtos.Response;
-using PokemonGame.Dtos.RoomBattle;
+using PokemonGame.Core.Models.Dtos.Response;
+using PokemonGame.Core.Models.Dtos.RoomBattle;
 using PokemonGame.Exceptions;
-using PokemonGame.Models;
-using PokemonGame.Models.SubModel;
-using PokemonGame.Services;
+using PokemonGame.Core.Models.Entities;
 using PokemonGame.Services.IService;
 using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
+using AutoMapper;
 
 namespace PokemonGame.Hubs
 {
-    public class GameHub : Hub
+    public class GameHub : BaseHub<GameHub>
     {
-        private readonly IUserContext _userContext;
-        private readonly IUserService _userService;
         private readonly IRoomBattleService _roomBattleService;
         private readonly IMoveService _moveService;
 
@@ -24,13 +20,14 @@ namespace PokemonGame.Hubs
         private static readonly ConcurrentDictionary<string, string> UserRoomMapping = new();
 
         public GameHub(
-            IUserContext userContext, 
             IUserService userService,
+            IHttpContextAccessor contextAccessor,
+            IUserContext userContext,
+            IMapper mapper,
+            ILogger<GameHub> logger,
             IRoomBattleService roomBattleService,
-            IMoveService moveService)
+            IMoveService moveService) : base(userService, contextAccessor, userContext, mapper, logger)
         {
-            _userContext = userContext;
-            _userService = userService;
             _roomBattleService = roomBattleService;
             _moveService = moveService;
         }

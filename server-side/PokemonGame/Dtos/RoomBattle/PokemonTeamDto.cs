@@ -1,4 +1,4 @@
-﻿using PokemonGame.Models.SubModel;
+﻿using PokemonGame.Core.Models.SubModel;
 using PokemonGame.Dtos.Pokemon;
 
 namespace PokemonGame.Dtos.RoomBattle

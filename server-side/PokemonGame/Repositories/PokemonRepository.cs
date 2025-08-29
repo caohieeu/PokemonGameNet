@@ -1,5 +1,5 @@
 ﻿using PokemonGame.DAL;
-using PokemonGame.Models;
+using PokemonGame.Core.Models.Entities;
 using PokemonGame.Repositories.IRepository;
 
 namespace PokemonGame.Repositories

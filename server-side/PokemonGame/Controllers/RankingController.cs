@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PokemonGame.Models.Response;
-using PokemonGame.Models;
+using PokemonGame.Core.Models.Response;
+using PokemonGame.Core.Models;
 using PokemonGame.Services;
 using PokemonGame.Services.IService;
 

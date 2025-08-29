@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using PokemonGame.Models.SubModel;
+using PokemonGame.Core.Models.SubModel;
 
 namespace PokemonGame.Dtos.RoomChat
 {

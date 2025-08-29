@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using System.Linq.Expressions;
+using MongoDB.Driver;
 using PokemonGame.Settings;
 
 namespace PokemonGame.Repositories.IRepository
@@ -15,5 +16,7 @@ namespace PokemonGame.Repositories.IRepository
         Task<bool> Remove(string id);
         Task<bool> UpdateOneByFilter(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update);
         Task<bool> ReplaceOneAsync(FilterDefinition<TEntity> filter, TEntity entity);
+        Task<IEnumerable<TResult>> GetFieldValueAsync<TResult>(Expression<Func<TEntity, TResult>> fieldSelector,
+            FilterDefinition<TEntity>? filter = null);
     }
 }

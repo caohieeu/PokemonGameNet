@@ -1,4 +1,4 @@
-﻿using PokemonGame.Models;
+﻿using PokemonGame.Core.Models;
 
 namespace PokemonGame.Dtos.RoomBattle
 {

@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using PokemonGame.Models;
 
 namespace PokemonGame.Dtos.Pokemon
 {
@@ -10,6 +9,6 @@ namespace PokemonGame.Dtos.Pokemon
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string Name { get; set; }
-        public List<Models.Pokemon> Pokemons { get; set; }
+        public List<Core.Models.Entities.Pokemon> Pokemons { get; set; }
     }
 }

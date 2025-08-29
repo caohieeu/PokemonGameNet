@@ -1,9 +1,9 @@
 ﻿using MongoDB.Bson;
-using PokemonGame.Dtos.Auth;
-using PokemonGame.Dtos.Pokemon;
-using PokemonGame.Dtos.Response;
-using PokemonGame.Models;
-using PokemonGame.Models.Response;
+using PokemonGame.Core.Models.Dtos.Auth;
+using PokemonGame.Core.Models.Dtos.Pokemon;
+using PokemonGame.Core.Models.Dtos.Response;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Models.Response;
 
 namespace PokemonGame.Services.IService
 {

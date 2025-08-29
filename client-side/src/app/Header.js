@@ -16,11 +16,30 @@ export default function Header() {
     const getUSer = useUser();
     const logoutUser = useLogout();
     const menuItems = [
-        "Home",
-        "Pokedex",
-        "Chat Rooms",
-        "Ranking",
-        "Log Out",
+        {
+            title: "Home",
+            name: "home",
+            url: "/home"
+        },
+        {
+            title: "Pokedex",
+            name: "pokedex",
+            url: "/pokedex"
+        },
+        {
+            title: "Chat Rooms",
+            name: "chat-rooms",
+            url: "/chat-rooms"
+        },
+        {
+            title: "Ranking",
+            name: "leader-board",
+            url: "/leader-board"
+        },
+        {
+            name: "log-out",
+            url: "/log-out"
+        },
     ];
 
     const items = [
@@ -53,7 +72,6 @@ export default function Header() {
     useEffect(() => {
         const fetchUser = async () => {
             const userData = await getUSer();
-            console.log(userData)
             setUser(userData);
         }
         fetchUser();
@@ -245,14 +263,16 @@ export default function Header() {
                 {menuItems.map((item, index) => (
                     <NavbarMenuItem key={`${item}-${index}`}>
                         <Link
+                            onClick={() => setActiveTab(item.name)}
                             className="w-full"
                             color={
-                                index === 2 ? "warning" : index === menuItems.length - 1 ? "danger" : "foreground"
+                                activeTab == item.name ? "warning" : "foreground"
+                                // index === 2 ? "warning" : index === menuItems.length - 1 ? "danger" : "foreground"
                             }
-                            href="#"
+                            href={item.url}
                             size="lg"
                         >
-                            {item}
+                            {item.title}
                         </Link>
                     </NavbarMenuItem>
                 ))}
