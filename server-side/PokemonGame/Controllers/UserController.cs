@@ -1,15 +1,9 @@
-﻿using AspNetCore.Identity.MongoDbCore.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using PokemonGame.Core.Models.Dtos.Auth;
 using PokemonGame.Core.Models.Dtos.Pokemon;
 using PokemonGame.Core.Models.Entities;
 using PokemonGame.Core.Models.Response;
-using PokemonGame.Services.IService;
-using PokemonGame.Settings;
-using System.Text.Json;
+using PokemonGame.Core.Interfaces.Services;
 
 namespace PokemonGame.Controllers
 {

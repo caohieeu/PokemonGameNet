@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.Extensions.Caching.Distributed;
 using MongoDB.Driver;
+using PokemonGame.Core.Constants;
 using PokemonGame.DAL;
 using PokemonGame.Exceptions;
 using PokemonGame.Repositories.IRepository;
@@ -12,11 +14,13 @@ namespace PokemonGame.Repositories
         protected readonly IMongoDatabase _database;
         protected readonly IMongoClient _client;
         protected readonly IMongoCollection<TEntity> _collection;
+        //protected readonly IDistributedCache _distributedCache;
         public Repository(IMongoContext context)
         {
             _database = context.Database;
             _client = context.Client;
             _collection = _database.GetCollection<TEntity>(typeof(TEntity).Name);
+            //_distributedCache = distributedCache;
         }
         public async Task<bool> Add(TEntity entity)
         {
@@ -52,10 +56,12 @@ namespace PokemonGame.Repositories
             return await all.ToListAsync();
         }
 
-        public async Task<PaginationModel<TEntity>> GetManyByFilter(int page, int pageSize, FilterDefinition<TEntity> filter, SortDefinition<TEntity> sorDef)
+        public async Task<PaginationModel<TEntity>> GetManyByFilter(int page, int pageSize, FilterDefinition<TEntity> filter)
         {
+            var sortDef = Builders<TEntity>.Sort.Ascending("Id");
+
             var data = await _collection.Find(filter)
-                .Sort(sorDef)
+                .Sort(sortDef)
                 .Skip(pageSize * (page - 1))
                 .Limit(pageSize)
                 .ToListAsync();
@@ -91,7 +97,7 @@ namespace PokemonGame.Repositories
                 return res;
             } catch
             {
-                throw new NotFoundException("This content is not found");
+                throw new NotFoundException(ExceptionMessage.CONTENT_NOT_FOUND);
             }
         }
 

@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonGame", "PokemonGame\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonGame.Core", "PokemonGame.Core\PokemonGame.Core.csproj", "{A3EB118F-33F6-4CC4-BF25-8B3D68544518}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonGame.Domain", "PokemonGame.Domain\PokemonGame.Domain.csproj", "{8B4DBE1A-0583-469C-8497-045CA5C35928}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonGame.Persistence", "PokemonGame.Persistence\PokemonGame.Persistence.csproj", "{ECEAAACB-BDA9-4BF2-A3CB-FF22EF623F68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{A3EB118F-33F6-4CC4-BF25-8B3D68544518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3EB118F-33F6-4CC4-BF25-8B3D68544518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3EB118F-33F6-4CC4-BF25-8B3D68544518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B4DBE1A-0583-469C-8497-045CA5C35928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B4DBE1A-0583-469C-8497-045CA5C35928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B4DBE1A-0583-469C-8497-045CA5C35928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B4DBE1A-0583-469C-8497-045CA5C35928}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECEAAACB-BDA9-4BF2-A3CB-FF22EF623F68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECEAAACB-BDA9-4BF2-A3CB-FF22EF623F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECEAAACB-BDA9-4BF2-A3CB-FF22EF623F68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECEAAACB-BDA9-4BF2-A3CB-FF22EF623F68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

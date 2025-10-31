@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PokemonGame.Core.Models.Dtos.RoomBattle;
 using PokemonGame.Core.Models.Response;
-using PokemonGame.Services;
-using PokemonGame.Services.IService;
+using PokemonGame.Core.Interfaces.Services;
 
 namespace PokemonGame.Controllers
 {

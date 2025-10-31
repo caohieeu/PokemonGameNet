@@ -1,24 +1,24 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using PokemonGame.DAL;
-using PokemonGame.Repositories;
-using PokemonGame.Repositories.IRepository;
-using PokemonGame.Services;
-using PokemonGame.Services.IService;
-using PokemonGame.Settings;
-using PokemonGame.Core.Mapper;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity;
+using PokemonGame.Core.Interfaces.Repositories;
+using PokemonGame.Domain.Services;
+using PokemonGame.Core.Interfaces.Services;
+using PokemonGame.Domain.Repositories;
 using PokemonGame.Middlewares;
+using PokemonGame.Core.Mapper;
+using PokemonGame.Core.Models.Entities;
+using PokemonGame.Core.Settings;
+using PokemonGame.Hubs;
+using PokemonGame.Persistence.DAL;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Extensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using PokemonGame.Hubs;
-using PokemonGame.Core.Models.Entities;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +54,14 @@ builder.Services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Obje
     .AddSignInManager<SignInManager<ApplicationUser>>()
     .AddRoleManager<RoleManager<ApplicationRole>>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddStackExchangeRedisCache(redisOptions =>
+{
+    var connectionHost = builder.Configuration["RedisCache:Host"];
+
+    redisOptions.Configuration = connectionHost;
+    redisOptions.InstanceName = "PokemonGame";
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -138,7 +146,7 @@ builder.Services.AddSingleton<IDatabaseSetting, DatabaseSetting>(st =>
     st.GetRequiredService<IOptions<DatabaseSetting>>().Value
 );
 builder.Services.AddSingleton<IMongoContext, MongoContext>();
-builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddScoped<IPokemonService, PokemonService>();
 builder.Services.AddScoped<IRoomChatService, RoomChatService>();
 builder.Services.AddScoped<IRoomBattleService, RoomBattleService>();
@@ -151,6 +159,7 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 });
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRankingService, RankingService>();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 
 //JWT
 var secretKey = builder.Configuration["AppSettings:SecretKey"];
@@ -219,6 +228,12 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
         IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes)
     };
+});
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["RedisCacheSettings:ConnectionString"];
+    options.InstanceName = builder.Configuration["RedisCacheSettings:InstanceName"];
 });
 
 var app = builder.Build();

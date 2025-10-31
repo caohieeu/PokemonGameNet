@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using PokemonGame.DAL;
+using PokemonGame.Persistence.DAL;
 using PokemonGame.Core.Models.Dtos.Response;
 using PokemonGame.Core.Models.Dtos.RoomBattle;
 using PokemonGame.Exceptions;
 using PokemonGame.Core.Models.Entities;
-using PokemonGame.Services.IService;
 using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
+using PokemonGame.Core.Interfaces.Services;
 
 namespace PokemonGame.Hubs
 {
@@ -22,7 +22,7 @@ namespace PokemonGame.Hubs
         public GameHub(
             IUserService userService,
             IHttpContextAccessor contextAccessor,
-            IUserContext userContext,
+            IUserContextService userContext,
             IMapper mapper,
             ILogger<GameHub> logger,
             IRoomBattleService roomBattleService,

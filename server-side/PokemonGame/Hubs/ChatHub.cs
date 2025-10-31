@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
-using PokemonGame.DAL;
+using PokemonGame.Persistence.DAL;
 using PokemonGame.Core.Models.Dtos.Response;
 using PokemonGame.Core.Models.Dtos.RoomChat;
 using PokemonGame.Exceptions;
 using PokemonGame.Core.Models.SubModel;
-using PokemonGame.Services.IService;
+using PokemonGame.Core.Interfaces.Services;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace PokemonGame.Hubs
@@ -17,7 +17,7 @@ namespace PokemonGame.Hubs
             IRoomChatService roomChatService, 
             IUserService userService,
             IHttpContextAccessor contextAccessor,
-            IUserContext userContext,
+            IUserContextService userContext,
             IMapper mapper,
             ILogger<ChatHub> logger) : base(userService, contextAccessor, userContext, mapper, logger)
         {

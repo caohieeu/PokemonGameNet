@@ -6,8 +6,8 @@ using PokemonGame.Core.Models.SubModel;
 using PokemonGame.Repositories.IRepository;
 using PokemonGame.Services.IService;
 using PokemonGame.Settings;
-using PokemonGame.Core.Helpers;
 using PokemonGame.Core.Constants;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace PokemonGame.Services
 {
@@ -16,14 +16,17 @@ namespace PokemonGame.Services
         private readonly IPokemonRepository _pokemonRepository;
         private readonly IMoveService _moveService;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _distributedCache;
         public PokemonService(
             IPokemonRepository pokemonRepository, 
             IMoveService moveService,
-            IMapper mapper)
+            IMapper mapper,
+            IDistributedCache distributedCache)
         {
             _pokemonRepository = pokemonRepository;
             _moveService = moveService;
             _mapper = mapper;
+            _distributedCache = distributedCache;
         }
 
         public async Task<Pokemon> GetDetailPokemonAsync(int pokemonId)
@@ -33,15 +36,15 @@ namespace PokemonGame.Services
             return await _pokemonRepository.GetByFilter(filter);
         }
 
-        public async Task<PaginationModel<Pokemon>> GetPokemonAsync(int page, int pageSize, string namePokemon)
+        public async Task<PaginationModel<Pokemon>> GetPokemonAsync(int page, int pageSize, string? namePokemon)
         {
             FilterDefinition<Pokemon> filter = null;
-            if(string.IsNullOrEmpty(namePokemon))
+            if(!string.IsNullOrEmpty(namePokemon))
                 filter = Builders<Pokemon>.Filter.Regex(x => x.Name, new MongoDB.Bson.BsonRegularExpression(namePokemon, "i"));
             else
                 filter = Builders<Pokemon>.Filter.Empty;
 
-            return await _pokemonRepository.GetManyByFilter(page, pageSize, filter, Builders<Pokemon>.Sort.Ascending(x => x.Id));
+            return await _pokemonRepository.GetManyByFilter(page, pageSize, filter);
         }
 
         public async Task<List<PokemonTeamDto>> GetRandomPokemons()
@@ -102,11 +105,11 @@ namespace PokemonGame.Services
         }
         async Task<List<MoveStateDto>> GetRandomMoves(Pokemon pokemon, int count)
         {
-            //var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
-            var moveIds = (await _pokemonRepository
-                        .GetFieldValueAsync(x => x.Moves.Select(m => (int)m.Id)))
-                        .SelectMany(ids => ids)
-                        .ToList();
+            var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
+            //var moveIds = (await _pokemonRepository
+            //            .GetFieldValueAsync(x => x.Moves.Select(m => (int)m.Id)))
+            //            .SelectMany(ids => ids)
+            //            .ToList();
             Random rand = new Random();
             HashSet<int> ids = new HashSet<int>();
             List<MoveStateDto> result = new List<MoveStateDto>();
