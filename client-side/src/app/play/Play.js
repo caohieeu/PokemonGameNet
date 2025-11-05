@@ -8,7 +8,7 @@ import {
   Avatar,
   Modal,
 } from "antd";
-import { SERVER_URI } from "../../utils/Uri";
+import { SERVER_URI } from "../../constants/Uri";
 import useGetUsersByUserName from "../../hooks/useGetUsersByUserName";
 import "./Play.css"
 import { useGetPokemons } from "../../hooks/useGetPokemons";
@@ -16,7 +16,7 @@ import { DownOutlined } from '@ant-design/icons';
 import TeamBuilder from "../../components/play/TeamBuilder";
 import Video from "../../assets/videos/video_fighting_2.mp4"
 import ListTeam from "../../components/play/ListTeam";
-import { typeColors } from "../../utils/TypeColors";
+import { typeColors } from "../../constants/TypeColors";
 import GameHubConnector from '../../context/GameHubConnector';
 import { useNavigate } from 'react-router-dom';
 

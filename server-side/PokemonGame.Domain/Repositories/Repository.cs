@@ -85,16 +85,24 @@ namespace PokemonGame.Domain.Repositories
             };
             pagination.total_pages = (int)Math.Ceiling(pagination.total_rows / (double)pageSize);
 
-            var results = await _cacheService.GetCacheAsync<List<TEntity>>(cacheKey);
-
-            if (results == null)
+            //var results = await _cacheService.GetCacheAsync<List<TEntity>>(cacheKey);
+            var results = new List<TEntity>();
+            while (await cursorData.MoveNextAsync())
             {
-                results = new List<TEntity>();
-                while (await cursorData.MoveNextAsync())
-                {
-                    results.AddRange(cursorData.Current);
-                }
+                results.AddRange(cursorData.Current);
             }
+            //if (results == null)
+            //{
+            //    results = new List<TEntity>();
+            //    while (await cursorData.MoveNextAsync())
+            //    {
+            //        results.AddRange(cursorData.Current);
+            //    }
+            //    await _cacheService.SetCache(cacheKey, results, new DistributedCacheEntryOptions
+            //    {
+            //        AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1)
+            //    });
+            //}
 
             pagination.data = results;
 

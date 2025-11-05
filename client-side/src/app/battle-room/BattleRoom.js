@@ -4,14 +4,14 @@ import { useState } from 'react';
 import "./BattleRoom.css"
 import "./AnimationPlayer.css"
 import "./AnimationOpponent.css"
-import { ClassAnimationPlayer } from '../../utils/ClassAnimationPlayer';
-import { ClassAnimationOpponent } from '../../utils/ClassAnimationOpponent';
+import { ClassAnimationPlayer } from '../../constants/ClassAnimationPlayer';
+import { ClassAnimationOpponent } from '../../constants/ClassAnimationOpponent';
 import pokeball from "../../assets/img/pokeball.png"
 import useGetRoomBattle from '../../hooks/useGetRoomBattle';
 import { useParams } from "react-router-dom";
 import useUserInfo from '../../hooks/useUserInfo';
 import GameHubConnector from '../../context/GameHubConnector';
-import { typeColors } from "../../utils/TypeColors";
+import { typeColors } from "../../constants/TypeColors";
 
 const twoColors = {
   '0%': '#108ee9',

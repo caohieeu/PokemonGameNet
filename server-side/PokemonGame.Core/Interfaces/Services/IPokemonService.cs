@@ -6,7 +6,7 @@ namespace PokemonGame.Core.Interfaces.Services
 {
     public interface IPokemonService
     {
-        Task<PaginationModel<Pokemon>> GetPokemonAsync(int page, int pageSize, string? namePokemon, string cacheKey);
+        Task<PaginationModel<Pokemon>> GetPokemonAsync(int page, int pageSize, string? namePokemon);
         Task<Pokemon> GetDetailPokemonAsync(int pokemonId);
         Task<List<PokemonTeamDto>> GetRandomPokemons();
     }

@@ -13,6 +13,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using PokemonGame.Domain.Exceptions;
+using PokemonGame.Core.Interfaces.Services;
 
 namespace PokemonGame.Domain.Repositories
 {
@@ -23,13 +24,15 @@ namespace PokemonGame.Domain.Repositories
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IMongoContext _context;
         private readonly IConfiguration _config;
+        private readonly ICacheService _cacheService;
         public UserRepository(
             IOptionsMonitor<AppSetting> options,
             IConfiguration config,
             IMongoContext context,
+            ICacheService cacheService,
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager
-            ) : base(context)
+            ) : base(context, cacheService)
         {
             _appSetting = options.CurrentValue;
             _context = context;

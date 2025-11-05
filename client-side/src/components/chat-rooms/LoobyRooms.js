@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Input, Button, List, Avatar } from 'antd';
 import ChatConnector from '../../context/ChatHubConnector';
 import useUserInfo from '../../hooks/useUserInfo';
-import { SERVER_URI } from '../../utils/Uri';
+import { SERVER_URI } from '../../constants/Uri';
 import useGetParticipants from '../../hooks/useGetParticipants';
 
 export default function LoobyRooms({ roomId }) {
@@ -123,6 +123,7 @@ export default function LoobyRooms({ roomId }) {
                             messages.map((message) => (
                                 <div key={message.id} className="mb-2">
                                     <strong
+                                        className="text-bordered"
                                         style={{
                                             color: getColorForUser(message.username),
                                         }}

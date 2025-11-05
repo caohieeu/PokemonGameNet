@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Input, Button, List, Avatar } from 'antd';
 import ChatConnector from '../../context/ChatHubConnector';
 import useUserInfo from '../../hooks/useUserInfo';
-import { SERVER_URI } from '../../utils/Uri';
+import { SERVER_URI } from '../../constants/Uri';
 import useGetParticipants from '../../hooks/useGetParticipants';
 
 export default function BattleRoom({ roomId }) {

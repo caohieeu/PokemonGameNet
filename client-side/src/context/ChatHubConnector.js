@@ -1,5 +1,5 @@
 import * as signalR from "@microsoft/signalr";
-import { CHAT_HUB } from "../utils/Uri";
+import { CHAT_HUB } from "../constants/Uri";
 
 const URL = CHAT_HUB;
 

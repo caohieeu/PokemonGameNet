@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
-using PokemonGame.Persistence.DAL;
 using PokemonGame.Core.Interfaces.Services;
 
 namespace PokemonGame.Hubs

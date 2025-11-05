@@ -1,5 +1,5 @@
 import axios from "axios";
-import { POKEAPI_URI } from "../utils/Uri";
+import { POKEAPI_URI } from "../constants/Uri";
 
 const useFetchEvolutionChain = () => {
     const getPokemonImage = (id) => 

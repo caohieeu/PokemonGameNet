@@ -53,7 +53,7 @@ namespace PokemonGame.Domain.Services
 
             for(int i = 0; i < 4; i++)
             {
-                var idPokemon = rnd.Next(1, 919);
+                var idPokemon = rnd.Next(1, 918);
                 var pokemon = await GetDetailPokemonAsync(idPokemon);
                 var pokemonTeam = _mapper.Map<PokemonTeamDto>(pokemon);
 
@@ -104,11 +104,11 @@ namespace PokemonGame.Domain.Services
         }
         async Task<List<MoveStateDto>> GetRandomMoves(Pokemon pokemon, int count)
         {
-            //var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
-            var moveIds = (await _pokemonRepository
-                        .GetFieldValueAsync(x => x.Moves.Select(m => (int)m.Id)))
-                        .SelectMany(ids => ids)
-                        .ToList();
+            var moveIds = pokemon.Moves.Select(x => (int)x.Id).ToList();
+            //var moveIds = (await _pokemonRepository
+            //            .GetFieldValueAsync(x => x.Moves.Select(m => (int)m.Id)))
+            //            .SelectMany(ids => ids)
+            //            .ToList();
             Random rand = new Random();
             HashSet<int> ids = new HashSet<int>();
             List<MoveStateDto> result = new List<MoveStateDto>();

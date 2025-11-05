@@ -1,5 +1,5 @@
 import * as signalR from "@microsoft/signalr";
-import { GAME_HUB } from "../utils/Uri";
+import { GAME_HUB } from "../constants/Uri";
 import { notification } from "antd";
 
 const URL = GAME_HUB;

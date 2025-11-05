@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { typeColors } from '../../utils/TypeColors'
+import { typeColors } from '../../constants/TypeColors'
 import { useFetchDetailMove } from '../../hooks/useFetchDetailMove'
 import { Avatar } from 'antd';
 

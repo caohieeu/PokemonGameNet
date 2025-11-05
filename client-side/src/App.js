@@ -9,16 +9,22 @@ import Pokedex from './app/pokedex/Pokedex';
 import Home from './app/home/Home';
 import Play from './app/play/Play';
 import ChatRooms from './app/chat-rooms/ChatRooms';
-import Leaderboard from './app/leader-board/LeaerBoard';
+import Leaderboard from './app/leader-board/LeaderBoard';
 import BattleRoom from './app/battle-room/BattleRoom';
+import Admin from './app/admin/index';
+import { useUser } from './hooks/useUser';
 
 function App() {
+  const [user, setUser] = useUser();
+
   return (
     //<SocketContext.Provider value={socket}>
       <NextUIProvider>
         <BrowserRouter>
           <Routes>
+            {user}
             <Route path="/" element={<Index />} />
+            <Route path="/admin" element={<Admin />} />
             <Route index path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="pokedex" element={<Pokedex />} />

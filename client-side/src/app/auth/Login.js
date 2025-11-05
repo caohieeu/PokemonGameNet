@@ -32,7 +32,6 @@ export default function Login() {
       md:w-1/3 w-full p-10 md:order-first order-last">
         <img
           className='flex-auto'
-          style={{width: 200, height: 200}}
           src={logo}
         />
         <p className='text-xl md:text-3xl font-sans font-bold w-full'

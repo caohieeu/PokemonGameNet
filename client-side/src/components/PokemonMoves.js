@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { SERVER_URI } from '../utils/Uri';
+import { SERVER_URI } from '../constants/Uri';
 import { useGetDetailPokemon } from '../hooks/useGetDetailPokemon';
 import { useFetchDetailMove } from '../hooks/useFetchDetailMove';
 import { Avatar, List } from 'antd';
@@ -62,7 +62,6 @@ export default function PokemonMoves({ pokemonId }) {
                         };
                     })
                 );
-                console.log(movesData);
                 setMoves(movesData);
             }
             catch (ex) {

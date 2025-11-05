@@ -79,7 +79,7 @@ namespace PokemonGame.Hubs
                 waittingList.Add(user);
             }
 
-            await CheckForMatch();
+            await CheckForMatch(user.Id);
         }
         async Task ReloadGroup(string userName1, string userName2, string roomId)
         {
@@ -95,7 +95,7 @@ namespace PokemonGame.Hubs
                 await Groups.AddToGroupAsync(conn, roomId);
             }
         }
-        public async Task CheckForMatch()
+        public async Task CheckForMatch(string currentUserId)
         {
             InfoUserResponseDto player1 = null;
             InfoUserResponseDto player2 = null;
@@ -108,7 +108,7 @@ namespace PokemonGame.Hubs
                     player2 = waittingList[1];
 
                     waittingList.RemoveRange(0, 2);
-                }
+                }   
             }
 
             if(player1 != null && player2 != null)

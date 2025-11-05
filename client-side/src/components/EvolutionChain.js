@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useFetchEvolutionChain } from '../hooks/useFetchEvolutionChain';
 import { Flex, Spin } from 'antd';
 import axios from 'axios';
-import { POKEAPI_URI } from '../utils/Uri';
+import { POKEAPI_URI } from '../constants/Uri';
 
 const contentStyle = {
     padding: 50,

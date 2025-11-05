@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PokemonGame.Core.Models.Response;
 using PokemonGame.Core.Interfaces.Services;
+using System.Diagnostics;
 
 namespace PokemonGame.Controllers
 {
@@ -20,6 +21,20 @@ namespace PokemonGame.Controllers
         {
             var response = await _pokemonService.GetPokemonAsync(page, pageSize, pokemonName);
             return Ok(new ApiResponse(200, "success", response));
+        }
+        [HttpGet("GetAllPokemon2")]
+        public async Task<IActionResult> GetAllPokemon2([FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20, [FromQuery] string? pokemonName = null)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var response = await _pokemonService.GetPokemonAsync(page, pageSize, pokemonName);
+            sw.Stop();
+            return Ok(new
+            {
+                ApiRespone = new ApiResponse(200, "success", response),
+                QueryTimeMs = sw.ElapsedMilliseconds
+            });
         }
         [HttpGet("{pokemonId}")]
         public async Task<IActionResult> GetPokemon(int pokemonId)

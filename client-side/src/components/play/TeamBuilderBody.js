@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import { createStyles } from 'antd-style';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
-import { typeColors } from '../../utils/TypeColors';
+import { typeColors } from '../../constants/TypeColors';
 import DetailPokemon from './DetailPokemon';
 
 const useStyle = createStyles(({ prefixCls, css }) => ({

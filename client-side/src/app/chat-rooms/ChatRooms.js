@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Tabs, Card, notification } from 'antd';
 import { Button, Modal, Space } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
-import Header from '../Header';
-import ChatRoomContent from '../../components/ChatRoomContent';
 import LoobyRooms from '../../components/chat-rooms/LoobyRooms';
 import BattleRoom from '../../components/chat-rooms/BattleRoom';
 import useGetRooms from '../../hooks/useGetRooms';
 import ChatConnector from '../../context/ChatHubConnector';
 import useUserInfo from '../../hooks/useUserInfo';
 import ChatHubConnector from '../../context/ChatHubConnector';
+import MainLayout from '../../components/layouts/MainLayout';
 
 export default function ChatRooms() {
   const [activeKey, setActiveKey] = useState('roomList');
@@ -37,12 +36,12 @@ export default function ChatRooms() {
       }
       return prevTabs;
     });
-    setActiveKey(room?.Id); 
+    setActiveKey(room?.Id);
   };
 
   const onEdit = (targetKey, action) => {
     if (action === 'remove') {
-      if(targetKey !== 'roomList') {
+      if (targetKey !== 'roomList') {
         const connector = ChatHubConnector;
         connector.ExitGroup(targetKey);
       }
@@ -54,34 +53,35 @@ export default function ChatRooms() {
   };
 
   return (
-    <div className='mx-1 md:mx-32'>
-      <Header />
-      <h1 className="text-center text-4xl font-bold my-4 text-[#555555]">
-        Chat Rooms
-      </h1>
+    <MainLayout>
+      <div className='mx-1 md:mx-32'>
+        <h1 className="text-center text-4xl font-bold my-4 text-[#555555]">
+          Chat Rooms
+        </h1>
 
-      <div style={{ padding: '16px' }}>
-        <Tabs
-          type="editable-card"
-          activeKey={activeKey}
-          onChange={setActiveKey}
-          onEdit={onEdit}
-        >
-          {openedTabs.map((tab) => (
-            <Tabs.TabPane 
-              tab={tab.label}
-              key={tab.key} 
-              closable={tab.closable ?? true}>
-              {tab.key !== "roomList" ? (
-                tab.key === '676f9a07849fb9191106065f' ? (
-                  <LoobyRooms roomId={tab.key} />
-                ) : <BattleRoom roomId={tab.key} />
-              ) : tab.children }
-            </Tabs.TabPane>
-          ))}
-        </Tabs>
+        <div style={{ padding: '16px' }}>
+          <Tabs
+            type="editable-card"
+            activeKey={activeKey}
+            onChange={setActiveKey}
+            onEdit={onEdit}
+          >
+            {openedTabs.map((tab) => (
+              <Tabs.TabPane
+                tab={tab.label}
+                key={tab.key}
+                closable={tab.closable ?? true}>
+                {tab.key !== "roomList" ? (
+                  tab.key === '676f9a07849fb9191106065f' ? (
+                    <LoobyRooms roomId={tab.key} />
+                  ) : <BattleRoom roomId={tab.key} />
+                ) : tab.children}
+              </Tabs.TabPane>
+            ))}
+          </Tabs>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }
 
@@ -90,16 +90,16 @@ const RoomList = ({ onRoomSelect }) => {
   const { roomChats } = useGetRooms(true);
 
   const handleJoinRoom = (room) => {
-    if(room?.Name !== "Lobby") {
-      if(!user) {
+    if (room?.Name !== "Lobby") {
+      if (!user) {
         notification.open({
           message: "Login required to join this chat room",
           type: "error",
           showProgress: true,
           pauseOnHover: false,
-      });
-      return;
-    }
+        });
+        return;
+      }
 
       const connector = ChatConnector;
       connector.JoinGroup(room?.Id)
@@ -111,7 +111,7 @@ const RoomList = ({ onRoomSelect }) => {
     Modal.confirm({
       title: 'Confirm',
       content: 'Join this room ?',
-      onOk: () => {handleJoinRoom(room)},
+      onOk: () => { handleJoinRoom(room) },
       footer: (_, { OkBtn, CancelBtn }) => (
         <>
           <CancelBtn />

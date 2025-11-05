@@ -8,6 +8,7 @@ import "./Pokedex.css"
 import BaseStat from "../../components/BaseStat";
 import Moves from "../../components/Moves";
 import PokemonMoves from "../../components/PokemonMoves";
+import { typeColors } from "../../constants/TypeColors";
 
 const { Search } = Input;
 
@@ -33,27 +34,6 @@ export default function Pokedex() {
     }
     fetchPokemons();
   }, [objectQuery])
-
-  const typeColors = {
-    normal: "#A8A878",
-    fighting: "#C03028",
-    flying: "#A890F0",
-    poison: "#A040A0",
-    ground: "#E0C068",
-    rock: "#B8A038",
-    bug: "#A8B820",
-    ghost: "#705898",
-    steel: "#B8B8D0",
-    fire: "#F08030",
-    water: "#6890F0",
-    grass: "#78C850",
-    electric: "#F8D030",
-    psychic: "#F85888",
-    ice: "#98D8D8",
-    dragon: "#7038F8",
-    dark: "#705848",
-    fairy: "#EE99AC",
-  };
 
   const DescriptionItem = ({ title, content }) => (
     <div className="site-description-item-profile-wrapper">
@@ -206,7 +186,7 @@ export default function Pokedex() {
                 radius="lg"
                 width="100%"
                 alt={item.Name}
-                className="w-full object-cover h-[170px]"
+                className="w-full object-cover h-auto"
                 src={item.Sprites.Image}
               />
               <b className="p-2">No: {item.Id}</b>
@@ -238,7 +218,7 @@ export default function Pokedex() {
       <Pagination
         onChange={onChangePage}
         className="flex justify-center w-full my-8"
-        defaultCurrent={6}
+        defaultCurrent={1}
         total={totalPage * 10}
       />
     </div>

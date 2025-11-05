@@ -6,7 +6,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem,
 import { PlusIcon } from "../assets/icon/PlusIcon";
 import { useUser } from "../hooks/useUser";
 import { useLogout } from "../hooks/useLogout";
-import { SERVER_URI } from "../utils/Uri";
+import { SERVER_URI } from "../constants/Uri";
 import { useLocation } from "react-router-dom";
 
 export default function Header() {
@@ -148,14 +148,16 @@ export default function Header() {
             </NavbarContent>
 
             <NavbarContent justify="end">
-                {!user && <><NavbarItem className="hidden lg:flex">
+                {!user && <>
+                <NavbarItem>
+                    <Button as={Link} color="warning" href="/register" variant="flat">
+                        Sign Up
+                    </Button>
+                </NavbarItem>
+                <NavbarItem className="hidden lg:flex">
                     <Link href="login" className="text-textBlue1">Login</Link>
                 </NavbarItem>
-                    <NavbarItem>
-                        <Button as={Link} color="warning" href="/register" variant="flat">
-                            Sign Up
-                        </Button>
-                    </NavbarItem></>}
+                </>}
                 {user && <><NavbarItem>
                     <Dropdown
                         showArrow
