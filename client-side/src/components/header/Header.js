@@ -8,6 +8,7 @@ import { useUser } from "../../hooks/useUser";
 import { useLogout } from "../../hooks/useLogout";
 import { SERVER_URI } from "../../constants/Uri";
 import { useLocation } from "react-router-dom";
+import * as RouteUri from "../../constants/RouteUri";
 
 export default function Header() {
     const [user, setUser] = useState();
@@ -200,8 +201,9 @@ export default function Header() {
                             <DropdownSection aria-label="Profile & Actions" showDivider>
                                 <DropdownItem
                                     isReadOnly
-                                    key="profile"
+                                    key="info"
                                     className="h-14 gap-2 opacity-100"
+                                    href={RouteUri.PROFILE_URI}
                                 >
                                     <User
                                         name={user?.data?.DisplayName || "not found"}
@@ -216,8 +218,8 @@ export default function Header() {
                                         }}
                                     />
                                 </DropdownItem>
-                                <DropdownItem key="dashboard">
-                                    Dashboard
+                                <DropdownItem key="profile_page" href={RouteUri.PROFILE_URI}>
+                                    Profile
                                 </DropdownItem>
                                 <DropdownItem key="settings">Settings</DropdownItem>
                                 <DropdownItem

@@ -80,5 +80,9 @@ namespace PokemonGame.Controllers
         {
             return Ok(new ApiResponse(200, "Success", await _userService.AddNewTeamPokemon(UserId, teamPokemon)));
         }
+        public async Task<IActionResult> UpdateUser([FromBody] ApplicationUser user)
+        {
+            return Ok(new ApiResponse(200, "Success", await _userService.UpdateUser(user)));
+        }
     }
 }

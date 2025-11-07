@@ -1,0 +1,1 @@
+export const PROFILE_URI = "/profile";

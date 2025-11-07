@@ -25,6 +25,7 @@ export default function useUserInfo() {
                 //     pauseOnHover: false,
                 // });
                 console.log(err.response.data.message || 'Get user failed')
+                setLoading(false);
             }
         };
         sub();

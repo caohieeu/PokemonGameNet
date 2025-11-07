@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Http;
 using PokemonGame.Persistence.DAL;
 using PokemonGame.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace PokemonGame.Domain.Services
 {
@@ -17,15 +18,18 @@ namespace PokemonGame.Domain.Services
         private readonly IMongoClient _client;
         private readonly IMongoCollection<ApplicationUser> _collection;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
         public UserContextService(
             IMongoContext context,
             IHttpContextAccessor contextAccessor,
-            IMapper mapper)
+            IMapper mapper,
+            UserManager<ApplicationUser> userManager)
         {
             _contextAccessor = contextAccessor;
             _database = context.Database;
             _client = context.Client;
             _mapper = mapper;
+            _userManager = userManager;
             _collection = _database.GetCollection<ApplicationUser>("Users");
         }
         public Dictionary<string, string> GetTokenInfo(string token)

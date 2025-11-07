@@ -1,17 +1,22 @@
-﻿using AutoMapper;
+﻿using System.IO.Pipes;
+using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using PokemonGame.Core.Models.Dtos.Response;
 using PokemonGame.Core.Models.Dtos.RoomBattle;
 using PokemonGame.Core.Models.Dtos.RoomChat;
 using PokemonGame.Core.Models.Entities;
 using PokemonGame.Core.Models.SubModel;
+using PokemonGame.Domain.Helpers;
 
-namespace PokemonGame.Core.Mapper
+namespace PokemonGame.Domain.Mapper
 {
     public class AutoMapperProfile : Profile
     {
         public AutoMapperProfile()
         {
-            CreateMap<InfoUserResponseDto, ApplicationUser>().ReverseMap();
+            CreateMap<InfoUserResponseDto, ApplicationUser>();
+            CreateMap<ApplicationUser, InfoUserResponseDto>()
+                .AfterMap<UserInfoMapping>();
             CreateMap<MovesPokemon, Moves>().ReverseMap();
             CreateMap<RoomChatCreateDto, RoomChat>()
                 .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => DateTime.Now))
@@ -25,6 +30,21 @@ namespace PokemonGame.Core.Mapper
             CreateMap<PokemonTeamDto, Pokemon>()
                 .ForMember(dest => dest.Moves, otp => otp.Ignore())
                 .ReverseMap();
+        }
+        
+        public class UserInfoMapping : IMappingAction<ApplicationUser, InfoUserResponseDto>
+        {
+            private readonly UserManager<ApplicationUser> _userManager;
+            public UserInfoMapping(UserManager<ApplicationUser> userManager)
+            {
+                _userManager = userManager;
+            }
+            public void Process(ApplicationUser source, InfoUserResponseDto destination, ResolutionContext context)
+            {
+                var userHelper = new UserHelper(_userManager);
+
+                destination.Roles = userHelper.GetRolesName(source);
+            }
         }
     }
 }

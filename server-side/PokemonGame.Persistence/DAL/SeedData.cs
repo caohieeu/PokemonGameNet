@@ -31,6 +31,7 @@ namespace PokemonGame.Persistence.DAL
                     DisplayName = "Admin",
                     Email = "admin@gmail.com",
                     PhoneNumber = "0123456789",
+                    Roles = new HashSet<string> { Roles.ADMIN },
                 };
 
                 var result = await _userManager.CreateAsync(user, "123123@Admin");

@@ -9,7 +9,7 @@ using PokemonGame.Domain.Services;
 using PokemonGame.Core.Interfaces.Services;
 using PokemonGame.Domain.Repositories;
 using PokemonGame.Middlewares;
-using PokemonGame.Core.Mapper;
+using PokemonGame.Domain.Mapper;
 using PokemonGame.Core.Models.Entities;
 using PokemonGame.Core.Settings;
 using PokemonGame.Hubs;
@@ -18,7 +18,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Extensions;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
